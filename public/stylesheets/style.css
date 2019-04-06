@@ -6,3 +6,11 @@ body {
 a {
   color: #00B7FF;
 }
+
+.jumbotron-3 {
+        position: relative;
+        background: url("/images/make-money-as-a-dog-walker.jpg") center center;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+}
