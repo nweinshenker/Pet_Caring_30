@@ -14,10 +14,14 @@ var passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 
-router.get('/logout',function(req,res){
+router.get('/',function(req,res,next){
 	console.log(req.isAuthenticated());
+	req.session.destroy();
 	req.logout();
+
 	console.log(req.isAuthenticated());
-	req.flash('sucess',"Logged Out! See you soon");
-	req.redirect('/login');
+	// req.flash('sucess',"Logged Out! See you soon");
+	res.redirect('/');
 });
+
+module.exports = router;

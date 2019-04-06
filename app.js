@@ -14,10 +14,14 @@ var session = require('express-session');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var dashboardRouter = require('./routes/dashboard');
+// var loginRouter = require('./routes/login')
 
-
+//////////////
 var signupOwnerRouter = require('./routes/signupOwner');
+var loginRouter = require('./routes/login');
+var logoutRouter = require('./routes/logout');
+
+///////
 var app = express();
 
 // view engine setup
@@ -38,14 +42,18 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+// app.use('/login', loginRouter);
 app.use('/users', usersRouter);
-app.use('/dashboard', dashboardRouter);
 
+/////////////////
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/signupOwner', signupOwnerRouter);
 
+app.use('/login',loginRouter);
+app.use('/logout',logoutRouter);
+////////////////
 
 
 
