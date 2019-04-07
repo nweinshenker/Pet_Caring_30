@@ -1,7 +1,7 @@
 // const sql_query = require('../sql');
 const passport = require('passport');
-const bcrypt = require('bcrypt')
-
+const bcrypt = require('bcrypt');
+var uuid = require('uuid');
 // Postgre SQL Connection
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -29,6 +29,8 @@ function initRouter(app) {
 	
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/login' , passport.antiMiddleware(), getlogin );
+	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
+	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 	
 	/* PROTECTED POST */
@@ -37,6 +39,7 @@ function initRouter(app) {
 	// app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	// app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	
+
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
 	/* LOGIN */
@@ -50,21 +53,21 @@ function initRouter(app) {
 }
 
 
-// function basic(req, res, page, other) {
-// 	var info = {
-// 		page: page,
-// 		user: req.user.username,
-// 		firstname: req.user.name,
-// 		// lastname : req.user.lastname,
-// 		// status   : req.user.status,
-// 	};
-// 	if(other) {
-// 		for(var fld in other) {
-// 			info[fld] = other[fld];
-// 		}
-// 	}
-// 	res.render(page, info);
-// }
+function basic(req, res, page, other) {
+	var info = {
+		page: page,
+		user: req.user.username,
+		firstname: req.user.name,
+		// lastname : req.user.lastname,
+		// status   : req.user.status,
+	};
+	if(other) {
+		for(var fld in other) {
+			info[fld] = other[fld];
+		}
+	}
+	res.render(page, info);
+}
 
 // function query(req, fld) {
 // 	return req.query[fld] ? req.query[fld] : '';
@@ -132,6 +135,43 @@ function logout(req,res,next){
 	req.logout();
 	res.redirect('/');
 }
+
+function becomeOwner(req,res,next){
+	var insert_query = 'INSERT INTO owner VALUES'+"('"+req.user.username+"')";
+	// console.log(req.user);
+	console.log(req.user.username);
+	// insert_query
+	pool.query(insert_query, function(err,result){
+		if(err){console.log(err);}
+		else{
+			console.log(result)
+			res.redirect('/');
+			return;
+		}
+	});
+	// res.redirect('/login');
+}
+
+function becomeCaretaker(req,res,next){
+	var insert_query = 'INSERT INTO caretaker VALUES'+"('"+req.user.username+"')";
+	// console.log(req.user);
+	console.log(req.user.username);
+	// insert_query
+	pool.query(insert_query, function(err,result){
+		if(err){
+			console.log(err);
+			res.redirect('/');
+			return;
+		}
+		else{
+			console.log(result)
+			res.redirect('/');
+			return;
+		}
+	});
+	// res.redirect('/login');
+}
+
 
 
 module.exports = initRouter;
