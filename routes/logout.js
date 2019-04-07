@@ -21,7 +21,7 @@ router.get('/',function(req,res,next){
 
 	console.log(req.isAuthenticated());
 	// req.flash('sucess',"Logged Out! See you soon");
-	res.redirect('/');
+	res.redirect('/login');
 });
 
 module.exports = router;
