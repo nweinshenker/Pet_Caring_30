@@ -21,7 +21,7 @@ create table caretaker
 
 create table petowned
 (
-    petnum int not null,
+    petnum int unique,
     name varchar(50) not null,
     ownerId varchar(50),
     age integer not null,
