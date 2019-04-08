@@ -39,6 +39,8 @@
         <option value="cat">Cat</option>
         </select>
     </div>
+<div id="toappend">
+</div>
             <button type="submit" class="btn btn-primary">Submit</button>
 
 
@@ -46,6 +48,25 @@
         </form>
 
 
+<script>
+    // $(document).ready(function(){
+        $('#catordog').on('change', function() {
+          var value = $(this).val();
+          // alert(value);
+          var mydiv = document.getElementById("toappend");
+          if(value == 'dog')
+          {
+            var content = '<br><div class="form-group"><label for="size">Size of Dog</label><input class="form-control" type ="text" id="size" name="size" placeholder="Enter the size big/small/medium"></div>';
+            var content2  ='<div class="form-group"><label for="temper">temper</label><input class="form-control" type ="text" id="temper" name="temper" placeholder="Temper of your dog"></div>';
+            mydiv.innerHTML += content;
+            mydiv.innerHTML += content2;
+
+          }
+          
+          // alert(content);
+        });
+    // });
+</script>
 
      <!--    <script>
             (function() {

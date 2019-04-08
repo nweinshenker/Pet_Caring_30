@@ -222,12 +222,41 @@ function getpet(req,res,next){
 function postpet(req,res,next){
 	console.log(req.body.catordog);
 	// console.log(req.user);
-	var sql_query = 'INSERT INTO pet VALUES';
+	var sql_query = 'BEGIN; INSERT INTO pet VALUES';
 	var id  = req.user.username;
+	var genid = uuidv4();
+	console.log(genid+"::::::::genid");
 	// var name    = req.user.Name;
 	// var password = req.user.password;
-	sql_query = sql_query+"('"+uuidv4()+"','"+id+"','"+req.body.age+"','"+req.body.breed+"')";
-	pool.query(sql_query,function(err,result){
+	sql_query = sql_query+"('"+genid+"','"+id+"','"+req.body.age+"','"+req.body.breed+"');";
+	
+
+	if(req.body.catordog == 'dog')
+	{
+		var pet_query = 'INSERT INTO dog VALUES';
+		pet_query = pet_query+ "('"+genid+"','"+req.body.size+"','"+req.body.temper+"')";
+	}
+	else if(req.body.catordog == 'cat')
+	{
+		var pet_query = 'INSERT INTO cat VALUES';
+		pet_query = pet_query+ "('"+genid+ "')";
+	}
+	console.log("yoyooyoyoyoyoyoyooyoy" + pet_query);
+	//  pool.query(pet_query,function(err,result){
+	// 	if(err)
+	// 		console.log(err);
+	// 	else
+	// 	{
+	// 		console.log(result);
+	// 		res.redirect('/');
+	// 		return;
+	// 	}
+	// });
+	// console.log(sql_query);
+
+	sql_query = sql_query + pet_query + ";END;";
+	console.log(sql_query);
+	  pool.query(sql_query,function(err,result){
 		if(err)
 			console.log(err);
 		else
