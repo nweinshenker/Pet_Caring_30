@@ -31,6 +31,7 @@ function initRouter(app) {
 	app.get('/login' , passport.antiMiddleware(), getlogin );
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
+	app.get('/addlist',passport.authMiddleware(), addlist);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 	
 	/* PROTECTED POST */
@@ -80,6 +81,11 @@ function basic(req, res, page, other) {
 
 function index(req,res,next){
 	res.render('index', { title: 'Express' });
+}
+
+function addlist(req,res,next){
+	res.render('list', { page: 'list' , title: 'Login' });
+
 }
 
 function register(req,res,next){
@@ -171,6 +177,8 @@ function becomeCaretaker(req,res,next){
 	});
 	// res.redirect('/login');
 }
+
+
 
 
 
