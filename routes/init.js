@@ -240,17 +240,6 @@ function postpet(req, res, next) {
 		pet_query = pet_query+ "('"+genid+ "')";
 	}
 	console.log("yoyooyoyoyoyoyoyooyoy" + pet_query);
-	//  pool.query(pet_query,function(err,result){
-	// 	if(err)
-	// 		console.log(err);
-	// 	else
-	// 	{
-	// 		console.log(result);
-	// 		res.redirect('/');
-	// 		return;
-	// 	}
-	// });
-	// console.log(sql_query);
 
 	sql_query = sql_query + pet_query + ";END;";
 	console.log(sql_query);
@@ -263,8 +252,6 @@ function postpet(req, res, next) {
 			return;
 		}
 	});
-	// res.redirect('/');
-	// return;
 }
 
 
