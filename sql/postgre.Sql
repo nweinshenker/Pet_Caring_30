@@ -60,7 +60,8 @@ create table list
     caretakerId varchar(50) references caretaker(caretakerId),
     serviceId varchar(50) references services(serviceId),
     basePrice int not null,
-    available_dates date not null
+    available_dates date not null,
+    unique(listId, caretakerId, available_dates)
 );
 
 create table provides
@@ -78,7 +79,7 @@ create table cares
     ownerId varchar(50) references owner,
     serviceId varchar(50) references services(serviceId),
     price integer not null,
-    time timestamp not null,
+    selected_date date not null,
     review varchar(100),
     primary key (caretakerId, petnum, ownerId, serviceId)
 );--look into how values are inserted in this table
