@@ -31,7 +31,7 @@ function initRouter(app) {
 	app.get('/login' , passport.antiMiddleware(), getlogin );
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
-	app.get('/addlist',passport.authMiddleware(), addlist);
+	app.get('/getlist',passport.authMiddleware(), getlist);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 	
 	/* PROTECTED POST */
@@ -42,7 +42,7 @@ function initRouter(app) {
 	
 
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
-
+	app.post('/postlist', passport.authMiddleware(), postlist);
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
 		successRedirect: '/login',
@@ -83,9 +83,30 @@ function index(req,res,next){
 	res.render('index', { title: 'Express' });
 }
 
-function addlist(req,res,next){
+function getlist(req,res,next){
 	res.render('list', { page: 'list' , title: 'Login' });
 
+}
+
+function postlist(req,res,next){
+	// console.log('hahahahaha');
+	console.log(req.user);
+	var sql_query = 'INSERT INTO list VALUES';
+	var id  = req.user.username;
+	// var name    = req.user.Name;
+	// var password = req.user.password;
+	sql_query = sql_query+"('"+id+"','"+req.body.day+"','"+req.body.price+"')";
+	pool.query(sql_query,function(err,result){
+		if(err)
+			console.log(err);
+		else
+		{
+			console.log(result);
+			res.redirect('/');
+			return;
+		}
+	})
+	// res.redirect('/');
 }
 
 function register(req,res,next){
