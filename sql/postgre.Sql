@@ -20,7 +20,6 @@ create table caretaker
 create table pet
 (
     petId integer primary key,
-    ownerId int,
     age integer not null,
     breed varchar(50) not null,
     foreign key (ownerId) references owner
@@ -105,3 +104,17 @@ create table bid
     price integer not null,
     primary key(ownerId, listId)
 );
+
+<-- 
+LANGUAGE plpgsql;
+
+CREATE TRIGGER lower_bid
+BEFORE INSERT OR UPDATE
+ON LIST 
+FOR EACH ROW
+EXECUTE PROCEDURE lower_bid();
+
+
+CREATE OR REPLACE FUNCTION lower_bid() RETURNS TRIGGER AS $ret$
+$$
+DECLARE 
