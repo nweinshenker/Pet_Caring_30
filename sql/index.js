@@ -1,12 +1,15 @@
 const sql = {}
 
 sql.query = {
-	// Counting & Average
 	count_play: 'SELECT COUNT(winner) FROM game_plays WHERE user1=$1 OR user2=$1',
 	count_wins: 'SELECT COUNT(winner) FROM game_plays WHERE winner=$1',
 	avg_rating: 'SELECT AVG(rating) FROM user_games INNER JOIN game_list ON user_games.gamename=game_list.gamename WHERE username=$1',
 	
-	// Information
+    // Information
+    all_caretakers: 'SELECT C.caretakerId, C.experience FROM (inner join caretaker C1 and careTaker C2) WHERE C1.caretakerId <> C2.careTakerId',
+    all_owners: 'SELECT ownerID FROM owner group by ownerId having count(*) > all (where o',
+
+
 	page_game: 'SELECT * FROM game_list WHERE ranking >= $1 AND ranking <= $2 ORDER BY ranking ASC',
 	page_lims: 'SELECT * FROM game_list ORDER BY ranking ASC LIMIT 10 OFFSET $1',
 	ctx_games: 'SELECT COUNT(*) FROM game_list',
@@ -30,3 +33,6 @@ sql.query = {
 }
 
 module.exports = sql
+
+
+

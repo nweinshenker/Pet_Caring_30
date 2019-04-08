@@ -17,6 +17,9 @@ const passport = require('passport')
 
 const app = express();
 
+/* --- V7: Using dotenv     --- */
+require('dotenv').config();
+
 // Body Parser Config
 app.use(bodyParser.urlencoded({
   extended: false
