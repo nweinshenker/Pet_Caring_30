@@ -5,7 +5,7 @@ const uuidv4 = require('uuid/v4');
 // Postgre SQL Connection
 const { Pool } = require('pg');
 const pool = new Pool({
-	user: 'nathanweinshenker',
+	user: 'tarush',
 	host: 'localhost',
 	database: 'postgres',
 	password: 'postgres',
@@ -220,7 +220,6 @@ function getpet(req, res, next) {
 function postpet(req, res, next) {
 	console.log(req.body.catordog);
 	// console.log(req.user);
-<<<<<<< HEAD
 	var sql_query = 'BEGIN; INSERT INTO pet VALUES';
 	var id  = req.user.username;
 	var genid = uuidv4();
@@ -257,15 +256,6 @@ function postpet(req, res, next) {
 	console.log(sql_query);
 	  pool.query(sql_query,function(err,result){
 		if(err)
-=======
-	var sql_query = 'INSERT INTO pet VALUES';
-	var id = req.user.username;
-	// var name    = req.user.Name;
-	// var password = req.user.password;
-	sql_query = sql_query + "('" + uuidv4() + "','" + id + "','" + req.body.age + "','" + req.body.breed + "')";
-	pool.query(sql_query, function (err, result) {
-		if (err)
->>>>>>> 2145b5ec8d2036f59aca850cd8884c59641393ab
 			console.log(err);
 		else {
 			console.log(result);
