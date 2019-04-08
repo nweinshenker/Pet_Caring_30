@@ -21,25 +21,31 @@ create table caretaker
 
 create table petowned
 (
-    petId varchar(50) primary key,
+    petnum int not null,
+    name varchar(50) not null,
     ownerId varchar(50),
     age integer not null,
     foreign key (ownerId) references owner
-        on delete cascade
+        on delete cascade,
+    primary key (petnum, ownerId)
 );-- need to enforce that each owner owns atleast 1 pet
 
 create table cat
 (
-    petId varchar(50) primary key references petowned (petId),
-    breed varchar(50) not null
+    petnum int references petowned (petnum),
+    ownerId varchar(50) references owner,
+    breed varchar(50) not null,
+    primary key(petnum, ownerId)
 );
 
 create table dog
 (
-    petId varchar(50) primary key references petowned (petId),
+    petnum int references petowned (petnum),
+    ownerId varchar(50) references owner,
     sizeOfPet varchar(10) not null,
     breed varchar(50) not null,
-    temper varchar(10) not null
+    temper varchar(10) not null,
+    primary key(petnum, ownerId)
 );
 
 create table services
@@ -68,12 +74,13 @@ create table provides
 create table cares
 (
     caretakerId varchar(50) references caretaker(caretakerId),
-    petId varchar(50) references petowned (petId),
+    petnum int references petowned (petnum),
+    ownerId varchar(50) references owner,
     serviceId varchar(50) references services(serviceId),
     price integer not null,
     time timestamp not null,
     review varchar(100),
-    primary key (caretakerId, petId, serviceId)
+    primary key (caretakerId, petnum, ownerId, serviceId)
 );--look into how values are inserted in this table
 
 --create table availaibility(
