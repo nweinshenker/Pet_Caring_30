@@ -1,7 +1,7 @@
 // const sql_query = require('../sql');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
-var uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
 // Postgre SQL Connection
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -32,6 +32,7 @@ function initRouter(app) {
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist',passport.authMiddleware(), getlist);
+	app.get('/getpet',passport.authMiddleware(), getpet);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 	
 	/* PROTECTED POST */
@@ -43,6 +44,7 @@ function initRouter(app) {
 
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 	app.post('/postlist', passport.authMiddleware(), postlist);
+	app.post('/postpet', passport.authMiddleware(), postpet);
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
 		successRedirect: '/login',
@@ -54,6 +56,9 @@ function initRouter(app) {
 }
 
 
+
+
+///Still not used
 function basic(req, res, page, other) {
 	var info = {
 		page: page,
@@ -83,6 +88,9 @@ function index(req,res,next){
 	res.render('index', { title: 'Express' });
 }
 
+
+
+/////Adding availability in table list
 function getlist(req,res,next){
 	res.render('list', { page: 'list' , title: 'Login' });
 
@@ -109,6 +117,10 @@ function postlist(req,res,next){
 	// res.redirect('/');
 }
 
+
+
+
+//Adding User
 function register(req,res,next){
 		res.render('register', { page: 'register' , auth: false, title: 'Owner Sign Up' ,
 		messages: {danger: req.flash('danger'), 
@@ -141,7 +153,7 @@ function reg_user(req,res,next){
 	// client.query('COMMIT')
 	console.log(result)
 	req.flash('success','User created.')
- 	res.redirect('/register');
+ 	res.redirect('/login');
 	return;
 	}
 	});
@@ -163,6 +175,9 @@ function logout(req,res,next){
 	res.redirect('/');
 }
 
+
+
+//Adding to caretaker or owner table
 function becomeOwner(req,res,next){
 	var insert_query = 'INSERT INTO owner VALUES'+"('"+req.user.username+"')";
 	// console.log(req.user);
@@ -200,7 +215,31 @@ function becomeCaretaker(req,res,next){
 }
 
 
+function getpet(req,res,next){
+	res.render('addpet', { page: 'addpet' , title: 'Add Pet' });
+}
 
+function postpet(req,res,next){
+	console.log(req.body.catordog);
+	// console.log(req.user);
+	var sql_query = 'INSERT INTO pet VALUES';
+	var id  = req.user.username;
+	// var name    = req.user.Name;
+	// var password = req.user.password;
+	sql_query = sql_query+"('"+uuidv4()+"','"+id+"','"+req.body.age+"','"+req.body.breed+"')";
+	pool.query(sql_query,function(err,result){
+		if(err)
+			console.log(err);
+		else
+		{
+			console.log(result);
+			res.redirect('/');
+			return;
+		}
+	});
+	// res.redirect('/');
+	// return;
+}
 
 
 module.exports = initRouter;
