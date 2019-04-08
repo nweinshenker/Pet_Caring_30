@@ -105,7 +105,7 @@ function postlist(req,res,next){
 			res.redirect('/');
 			return;
 		}
-	})
+	});
 	// res.redirect('/');
 }
 
