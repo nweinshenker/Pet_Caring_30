@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 create table users
 (
     userId varchar(50) primary key,
@@ -17,7 +19,7 @@ create table caretaker
     experience varchar(100)
 );
 
-create table pet
+create table petowned
 (
     petId varchar(50) primary key,
     ownerId varchar(50),
@@ -28,13 +30,13 @@ create table pet
 
 create table cat
 (
-    petId varchar(50) primary key references pet(petId),
+    petId varchar(50) primary key references petowned (petId),
     breed varchar(50) not null
 );
 
 create table dog
 (
-    petId varchar(50) primary key references pet(petId),
+    petId varchar(50) primary key references petowned (petId),
     sizeOfPet varchar(10) not null,
     breed varchar(50) not null,
     temper varchar(10) not null
@@ -52,7 +54,7 @@ create table list
     caretakerId varchar(50) references caretaker(caretakerId),
     serviceId varchar(50) references services(serviceId),
     basePrice int not null,
-    time timestamp not null
+    available_dates date not null
 );
 
 create table provides
@@ -66,7 +68,7 @@ create table provides
 create table cares
 (
     caretakerId varchar(50) references caretaker(caretakerId),
-    petId varchar(50) references pet(petId),
+    petId varchar(50) references petowned (petId),
     serviceId varchar(50) references services(serviceId),
     price integer not null,
     time timestamp not null,
