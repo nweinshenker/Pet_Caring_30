@@ -90,27 +90,41 @@ function index(req, res, next) {
 
 /////Adding availability in table list
 function getlist(req,res,next){
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
 	res.render('list', { page: 'list' , title: 'Login' });
 
 }
 
 function postlist(req, res, next) {
 	// console.log('hahahahaha');
-	console.log(req.user);
-	var sql_query = 'INSERT INTO list VALUES';
-	var id = req.user.username;
-	// var name    = req.user.Name;
-	// var password = req.user.password;
-	sql_query = sql_query + "('" + id + "','" + req.body.day + "','" + req.body.price + "')";
-	pool.query(sql_query, function (err, result) {
-		if (err)
-			console.log(err);
-		else {
-			console.log(result);
-			res.redirect('/');
-			return;
-		}
-	});
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		console.log(req.user);
+		var sql_query = 'INSERT INTO list VALUES';
+		var id = req.user.username;
+		// var name    = req.user.Name;
+		// var password = req.user.password;
+		sql_query = sql_query + "('" + id + "','" + req.body.day + "','" + req.body.price + "')";
+		pool.query(sql_query, function (err, result) {
+			if (err)
+				console.log(err);
+			else {
+				console.log(result);
+				res.redirect('/');
+				return;
+			}
+		});
+	}
 	// res.redirect('/');
 }
 
@@ -142,7 +156,7 @@ function postpet(req, res, next) {
 	}
 	else
 	{
-		console.log(req.body.catordog);
+	console.log(req.body.catordog);
 	// console.log(req.user);
 	var sql_query = 'BEGIN; INSERT INTO petowned VALUES';
 	var id  = req.user.username;
@@ -219,7 +233,7 @@ function becomeCaretaker(req, res, next) {
 		}
 	});
 	// res.redirect('/login');
-
+}
 
 
 function getsitter(req, res, next) {
@@ -230,6 +244,7 @@ function getsitter(req, res, next) {
 			warning: req.flash('warning'), success: req.flash('success')
 		}
 	});
+}
 
 //Adding User
 function register(req, res, next) {
