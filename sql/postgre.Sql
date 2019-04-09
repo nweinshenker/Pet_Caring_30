@@ -72,7 +72,6 @@ create table provides
 (
     caretakerId varchar(50) references caretaker(caretakerId),
     serviceId varchar(50) references services(serviceId),
-    price integer not null,
     primary key (caretakerId, serviceId)
 );-- need to enforce that each caretaker has atleast 1 service(not there in the ER model)
 
@@ -116,6 +115,8 @@ create table bid
     price integer not null,
     petNum varchar(50) references petowned(petnum),
     primary key(ownerId, listId)
+--petNum in primary key?
+--add trigger to remove previous bid from the user.
 );
 
 
