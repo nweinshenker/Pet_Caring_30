@@ -11,7 +11,7 @@ const pool = new Pool({
 	// password: 'postgres',
 	// port: 5432,
 	connectionString: process.env.DATABASE_URL,
-	ssl: true
+	// ssl: true
 });
 
 const round = 10;
@@ -69,6 +69,9 @@ function basic(req, res, page, other) {
 	res.render(page, info);
 }
 
+
+
+///home
 function index(req, res, next) {
 	res.render('index', { title: 'Express' });
 }
@@ -128,10 +131,10 @@ function reg_user(req, res, next) {
 	console.log(pwd);
 	var insert_query = sql_query + "('" + id + "','" + name + "','" + pwd + "')";
 	pool.query(check_query, function (err, result) {
-		console.log(result.rows);
+		// console.log(result.rows);
 		if (result.rows[0]) {
 			req.flash('warning', "This email address is already registered.");
-			console.log("yoyoyooyooyyooyoyoyoy");
+			// console.log("yoyoyooyooyyooyoyoyoy");
 			res.redirect('/register');
 		}
 		else {
@@ -147,6 +150,16 @@ function reg_user(req, res, next) {
 			});
 		}
 	});
+	// var sql_query = 'select * from users';
+	// pool.query(sql_query, function(err,result){
+	// 	if(err)
+	// 		console.log(err);
+	// 	else{
+	// 		console.log(result);
+	// 		res.redirect('/');
+	// 		return;
+	// 	}
+	// });
 }
 
 
@@ -218,26 +231,25 @@ function getpet(req, res, next) {
 }
 
 function postpet(req, res, next) {
-	console.log(req.body.catordog);
+	// console.log(req.body.catordog);
 	// console.log(req.user);
-	var sql_query = 'BEGIN; INSERT INTO pet VALUES';
+	var sql_query = 'BEGIN; INSERT INTO petowned VALUES';
 	var id  = req.user.username;
 	var genid = uuidv4();
 	console.log(genid+"::::::::genid");
 	// var name    = req.user.Name;
 	// var password = req.user.password;
-	sql_query = sql_query+"('"+genid+"','"+id+"','"+req.body.age+"','"+req.body.breed+"');";
-	
+	sql_query = sql_query+"('"+genid+"','"+req.body.pname+"','"+id+"','"+req.body.age+"');";
 
 	if(req.body.catordog == 'dog')
 	{
 		var pet_query = 'INSERT INTO dog VALUES';
-		pet_query = pet_query+ "('"+genid+"','"+req.body.size+"','"+req.body.temper+"')";
+		pet_query = pet_query+ "('"+genid+"','"+id+"','"+req.body.size+"','"+req.body.breed+"','"+req.body.temper+"')";
 	}
 	else if(req.body.catordog == 'cat')
 	{
 		var pet_query = 'INSERT INTO cat VALUES';
-		pet_query = pet_query+ "('"+genid+ "')";
+		pet_query = pet_query+ "('"+genid+"','"+id+ "','"+ req.body.breed+"')";
 	}
 	console.log("yoyooyoyoyoyoyoyooyoy" + pet_query);
 
