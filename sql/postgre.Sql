@@ -9,19 +9,21 @@ create table users
 
 create table owner
 (
-    ownerId varchar(50) primary key references users(userId),
+    ownerId varchar(50) primary key references users(userId)
+    	on delete cascade,
     age integer
 );
 
 create table caretaker
 (
-    caretakerId varchar(50) primary key references users(userId),
+    caretakerId varchar(50) primary key references users(userId)
+    	on delete cascade,
     experience varchar(100)
 );
 
 create table petowned
 (
-    petnum int unique,
+    petnum varchar(50) unique,
     name varchar(50) not null,
     ownerId varchar(50),
     age integer not null,
@@ -32,7 +34,8 @@ create table petowned
 
 create table cat
 (
-    petnum int references petowned (petnum),
+    petnum varchar(50) references petowned (petnum)
+    	on delete cascade,
     ownerId varchar(50) references owner,
     breed varchar(50) not null,
     primary key(petnum, ownerId)
@@ -40,7 +43,8 @@ create table cat
 
 create table dog
 (
-    petnum int references petowned (petnum),
+    petnum varchar(50) references petowned (petnum)
+    	on delete cascade,
     ownerId varchar(50) references owner,
     sizeOfPet varchar(10) not null,
     breed varchar(50) not null,
@@ -75,7 +79,7 @@ create table provides
 create table cares
 (
     caretakerId varchar(50) references caretaker(caretakerId),
-    petnum int references petowned (petnum),
+    petnum varchar(50) references petowned (petnum),
     ownerId varchar(50) references owner,
     serviceId varchar(50) references services(serviceId),
     price integer not null,
@@ -94,12 +98,14 @@ create table cares
 create table athome
 (
     serviceId varchar(50) primary key references services(serviceID)
+    	on delete cascade
     -- extra fields like home key or user authentication required. See how it translates to the functional requirements
 );
 
 create table notathome
 (
     serviceId varchar(50) primary key references services(serviceID)
+    	on delete cascade
 );
 
 create table bid
@@ -107,5 +113,57 @@ create table bid
     ownerId varchar(50) references owner(ownerId),
     listId varchar(50) references list(listId),
     price integer not null,
+    petNum varchar(50) references petowned(petnum),
     primary key(ownerId, listId)
 );
+
+
+-- triggers
+
+-- trigger 1- bid must be higher than max bid
+
+CREATE OR REPLACE FUNCTION min_bid()
+RETURNS TRIGGER AS 
+$$
+DECLARE maxPrice numeric;
+BEGIN 
+    select coalesce(max(basePrice),0) into maxPrice
+    from list;
+    if NEW.basePrice <= maxPrice then
+        RAISE NOTICE ‘bid must be higher than current maximum bid’;
+        return null;
+    else
+        return new;
+    end if;
+END; 
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER minBid
+BEFORE INSERT OR UPDATE ON list
+FOR EACH ROW
+EXECUTE PROCEDURE min_bid();
+
+
+-- trigger 3
+
+CREATE OR replace FUNCTION trig_func3()
+    returns TRIGGER AS
+$$
+DECLARE occurrence Integer;
+BEGIN
+    SELECT COUNT(*) FROM bid b WHERE b.listId = NEW.listId into occurrence;
+    IF occurrence > 0 THEN
+        raise notice 'Update not valid';
+        RETURN null;
+    ELSE
+        raise notice 'Update valid';
+        RETURN NEW;
+    END IF;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER trig3
+    BEFORE UPDATE ON list
+    FOR EACH ROW
+EXECUTE PROCEDURE trig_func3();
