@@ -10,10 +10,10 @@ var bcrypt = require('bcrypt');
 var flash = require('connect-flash');
 var request = require('request');
 
-const exphbs = require('express-handlebars')
-const bodyParser = require('body-parser')
-const session = require('express-session')
-const passport = require('passport')
+const exphbs = require('express-handlebars');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const passport = require('passport');
 
 const app = express();
 
@@ -33,8 +33,8 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }))
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 // View Engine setup
