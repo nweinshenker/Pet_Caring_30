@@ -87,6 +87,7 @@ create table cares
     review varchar(100),
     primary key (caretakerId, petnum, ownerId, serviceId)
 );--look into how values are inserted in this table
+-- where does review come from?
 
 --create table availaibility(
 --caretakerId int references caretaker(caretakerId),
@@ -113,5 +114,84 @@ create table bid
     ownerId varchar(50) references owner(ownerId),
     listId varchar(50) references list(listId),
     price integer not null,
+    petNum varchar(50) references petowned(petnum),
     primary key(ownerId, listId)
 );
+
+
+-- triggers
+
+-- trigger 1 - bid must be higher than max bid
+
+CREATE OR REPLACE FUNCTION min_bid()
+RETURNS TRIGGER AS 
+$$
+DECLARE maxPrice numeric;
+BEGIN 
+    select coalesce(max(basePrice),0) into maxPrice
+    from list;
+    if NEW.basePrice <= maxPrice then
+        RAISE NOTICE ‘bid must be higher than current maximum bid’;
+        return null;
+    else
+        return new;
+    end if;
+END; 
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER minBid
+BEFORE INSERT OR UPDATE ON list
+FOR EACH ROW
+EXECUTE PROCEDURE min_bid();
+
+
+-- trigger 2 (not working yet)
+-- automatically push highest price etc into cares table 
+-- every time someone bids
+
+CREATE OR REPLACE FUNCTION push_bid()
+RETURNS TRIGGER AS 
+$$
+DECLARE cid varchar(50); sid varchar(50); ad date; 
+BEGIN 
+    SELECT caretakerId into cid, serviceId into sid, available_dates into ad
+    FROM list l
+    where l.listId = new.listId;
+    INSERT INTO cares VALUES
+    (cid, new.petNum, new.ownerId, sid, new.price, ad, null);
+    RAISE NOTICE ‘bidding details pushed to cares table’;
+    RETURN NULL;
+END; 
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER pushBid
+AFTER INSERT OR UPDATE ON bid
+FOR EACH ROW
+EXECUTE PROCEDURE push_bid();
+
+
+
+
+-- trigger 3
+
+CREATE OR replace FUNCTION trig_func3()
+    returns TRIGGER AS
+$$
+DECLARE occurrence Integer;
+BEGIN
+    SELECT COUNT(*) FROM bid b WHERE b.listId = NEW.listId into occurrence;
+    IF occurrence > 0 THEN
+        raise notice 'Update not valid';
+        RETURN null;
+    ELSE
+        raise notice 'Update valid';
+        RETURN NEW;
+    END IF;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER trig3
+    BEFORE UPDATE ON list
+    FOR EACH ROW
+EXECUTE PROCEDURE trig_func3();
