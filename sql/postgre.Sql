@@ -116,6 +116,35 @@ create table bid
     primary key(ownerId, listId)
 );
 
+
+-- triggers
+
+-- trigger 1- bid must be higher than max bid
+
+CREATE OR REPLACE FUNCTION min_bid()
+RETURNS TRIGGER AS 
+$$
+DECLARE maxPrice numeric;
+BEGIN 
+    select coalesce(max(basePrice),0) into maxPrice
+    from list;
+    if NEW.basePrice <= maxPrice then
+        RAISE NOTICE ‘bid must be higher than current maximum bid’;
+        return null;
+    else
+        return new;
+    end if;
+END; 
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER minBid
+BEFORE INSERT OR UPDATE ON list
+FOR EACH ROW
+EXECUTE PROCEDURE min_bid();
+
+
+-- trigger 3
+
 CREATE OR replace FUNCTION trig_func3()
     returns TRIGGER AS
 $$
