@@ -22,11 +22,6 @@
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-        $(function () {
-            $("#datepicker").datepicker();
-        });
-    </script>
 
     <!-- ADDED JavaScript -->
     <script src="javascripts/loginScript.js"></script>
@@ -34,6 +29,9 @@
 
 
 <body>
+
+    <%- include navbar.ejs%>
+
     <h1><%= title%></h1>
 
 
@@ -55,20 +53,21 @@
 
 
 
-    <form id="html_form" action="login" role="form" method="post">
+        <form id="html_form" action="login" role="form" method="post">
 
-        <div class="form-group">
-            <label for="username">Email ID</label>
-            <input class="form-control" type="email" id="username" name="username" placeholder="Enter your email id">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" name="password" id="password" placeholder="Enter your Password">
-        </div>
+            <div class="form-group">
+                <label for="username">Email ID</label>
+                <input class="form-control" type="email" id="username" name="username"
+                    placeholder="Enter your email id">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" name="password" id="password"
+                    placeholder="Enter your Password">
+            </div>
 
-        <p>Date: <input type="text" id="datepicker"></p>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
 
 
 
@@ -81,6 +80,9 @@
                 });
             }, false);
         })();
+    </script>
+    <script>
+        $('.datepicker').datepicker();
     </script>
 
 
