@@ -113,6 +113,7 @@ create table bid
     ownerId varchar(50) references owner(ownerId),
     listId varchar(50) references list(listId),
     price integer not null,
+    petNum varchar(50) references petowned(petnum),
     primary key(ownerId, listId)
 );
 
