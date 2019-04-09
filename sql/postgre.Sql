@@ -9,7 +9,7 @@ create table users
 
 create table owner
 (
-    ownerId varchar(50) primary key references users(userId),
+    ownerId varchar(50) primary key references users(userId)
     	on delete cascade,
     age integer
 );
