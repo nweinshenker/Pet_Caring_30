@@ -23,7 +23,7 @@ create table caretaker
 
 create table petowned
 (
-    petnum int unique,
+    petnum varchar(50) unique,
     name varchar(50) not null,
     ownerId varchar(50),
     age integer not null,
@@ -34,7 +34,7 @@ create table petowned
 
 create table cat
 (
-    petnum int references petowned (petnum)
+    petnum varchar(50) references petowned (petnum)
     	on delete cascade,
     ownerId varchar(50) references owner,
     breed varchar(50) not null,
@@ -43,7 +43,7 @@ create table cat
 
 create table dog
 (
-    petnum int references petowned (petnum)
+    petnum varchar(50) references petowned (petnum)
     	on delete cascade,
     ownerId varchar(50) references owner,
     sizeOfPet varchar(10) not null,
@@ -79,7 +79,7 @@ create table provides
 create table cares
 (
     caretakerId varchar(50) references caretaker(caretakerId),
-    petnum int references petowned (petnum),
+    petnum varchar(50) references petowned (petnum),
     ownerId varchar(50) references owner,
     serviceId varchar(50) references services(serviceId),
     price integer not null,
