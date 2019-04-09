@@ -115,3 +115,25 @@ create table bid
     price integer not null,
     primary key(ownerId, listId)
 );
+
+CREATE OR replace FUNCTION trig_func3()
+    returns TRIGGER AS
+$$
+DECLARE occurrence Integer;
+BEGIN
+    SELECT COUNT(*) FROM bid b WHERE b.listId = NEW.listId into occurrence;
+    IF occurrence > 0 THEN
+        raise notice 'Update not valid';
+        RETURN null;
+    ELSE
+        raise notice 'Update valid';
+        RETURN NEW;
+    END IF;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER trig3
+    BEFORE UPDATE ON list
+    FOR EACH ROW
+EXECUTE PROCEDURE trig_func3();
