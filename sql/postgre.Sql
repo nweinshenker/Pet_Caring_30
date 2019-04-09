@@ -10,12 +10,14 @@ create table users
 create table owner
 (
     ownerId varchar(50) primary key references users(userId),
+    	on delete cascade,
     age integer
 );
 
 create table caretaker
 (
-    caretakerId varchar(50) primary key references users(userId),
+    caretakerId varchar(50) primary key references users(userId)
+    	on delete cascade,
     experience varchar(100)
 );
 
@@ -32,7 +34,8 @@ create table petowned
 
 create table cat
 (
-    petnum int references petowned (petnum),
+    petnum int references petowned (petnum)
+    	on delete cascade,
     ownerId varchar(50) references owner,
     breed varchar(50) not null,
     primary key(petnum, ownerId)
@@ -40,7 +43,8 @@ create table cat
 
 create table dog
 (
-    petnum int references petowned (petnum),
+    petnum int references petowned (petnum)
+    	on delete cascade,
     ownerId varchar(50) references owner,
     sizeOfPet varchar(10) not null,
     breed varchar(50) not null,
@@ -94,12 +98,14 @@ create table cares
 create table athome
 (
     serviceId varchar(50) primary key references services(serviceID)
+    	on delete cascade
     -- extra fields like home key or user authentication required. See how it translates to the functional requirements
 );
 
 create table notathome
 (
     serviceId varchar(50) primary key references services(serviceID)
+    	on delete cascade
 );
 
 create table bid
