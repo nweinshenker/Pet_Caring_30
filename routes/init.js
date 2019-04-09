@@ -10,8 +10,7 @@ const pool = new Pool({
 	// database: 'postgres',
 	// password: 'postgres',
 	// port: 5432,
-	connectionString: process.env.DATABASE_URL,
-	ssl: true
+	connectionString: process.env.DATABASE_URL
 });
 
 const round = 10;
@@ -20,7 +19,6 @@ const salt = bcrypt.genSaltSync(round);
 function initRouter(app) {
 	/* GET */
 	app.get('/', index);
-
 	app.get('/register', passport.antiMiddleware(), register);
 	app.get('/login', passport.antiMiddleware(), getlogin);
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
