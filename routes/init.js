@@ -29,6 +29,8 @@ function initRouter(app) {
 	app.get('/setsession', passport.authMiddleware(), setsession);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 
+	app.get('/findsitter',passport.authMiddleware(), getsitter);
+
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
 	// app.post('/update_pass', passport.authMiddleware(), update_pass);
@@ -217,8 +219,17 @@ function becomeCaretaker(req, res, next) {
 		}
 	});
 	// res.redirect('/login');
-}
 
+
+
+function getsitter(req, res, next) {
+	res.render('findsitter', {
+		page: 'findsitter', auth: false, title: 'Finding a Sitter',
+		messages: {
+			danger: req.flash('danger'),
+			warning: req.flash('warning'), success: req.flash('success')
+		}
+	});
 
 //Adding User
 function register(req, res, next) {

@@ -87,6 +87,7 @@ create table cares
     review varchar(100),
     primary key (caretakerId, petnum, ownerId, serviceId)
 );--look into how values are inserted in this table
+-- where does review come from?
 
 --create table availaibility(
 --caretakerId int references caretaker(caretakerId),
@@ -120,7 +121,7 @@ create table bid
 
 -- triggers
 
--- trigger 1- bid must be higher than max bid
+-- trigger 1 - bid must be higher than max bid
 
 CREATE OR REPLACE FUNCTION min_bid()
 RETURNS TRIGGER AS 
@@ -142,6 +143,33 @@ CREATE TRIGGER minBid
 BEFORE INSERT OR UPDATE ON list
 FOR EACH ROW
 EXECUTE PROCEDURE min_bid();
+
+
+-- trigger 2 (not working yet)
+-- automatically push highest price etc into cares table 
+-- every time someone bids
+
+CREATE OR REPLACE FUNCTION push_bid()
+RETURNS TRIGGER AS 
+$$
+DECLARE cid varchar(50); sid varchar(50); ad date; 
+BEGIN 
+    SELECT caretakerId into cid, serviceId into sid, available_dates into ad
+    FROM list l
+    where l.listId = new.listId;
+    INSERT INTO cares VALUES
+    (cid, new.petNum, new.ownerId, sid, new.price, ad, null);
+    RAISE NOTICE ‘bidding details pushed to cares table’;
+    RETURN NULL;
+END; 
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER pushBid
+AFTER INSERT OR UPDATE ON bid
+FOR EACH ROW
+EXECUTE PROCEDURE push_bid();
+
+
 
 
 -- trigger 3
