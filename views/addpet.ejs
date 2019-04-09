@@ -21,26 +21,30 @@
     <h1><%= title%></h1>
 
     <form id="html_form" action="postpet" role="form" method="post">
-           
+            <div class="form-group">
+                <label for="pname">Pet Age</label>
+                <input class="form-control" type ="text" id="pname" name="pname" placeholder="Enter the name of your pet" required>
+            </div>
             <div class="form-group">
                 <label for="age">Pet Age</label>
-                <input class="form-control" type ="number" step="1" id="age" name="age" placeholder="Enter the age">
+                <input class="form-control" type ="number" step="1" id="age" name="age" placeholder="Enter the age" required>
             </div>
-            <div class="form-group">
-                <label for="breed">Breed</label>
-                <input type="text" class="form-control" name="breed" id="breed" placeholder="Enter your pet's breed">
-            </div>
+            
             
     <div>
         <label for="pettype">Pet Type</label>
-        <select class="browser-default custom-select" id="catordog" name="catordog">
+        <select class="browser-default custom-select" id="catordog" name="catordog" required>
         <option selected>Show the list of pets available</option>
         <option value="dog">Dog</option>
         <option value="cat">Cat</option>
         </select>
     </div>
 <div id="toappend">
-</div>
+    <div class="form-group">
+                <label for="breed">Breed</label>
+                <input type="text" class="form-control" name="breed" id="breed" placeholder="Enter your pet's breed" required>
+            </div>
+    </div>
             <button type="submit" class="btn btn-primary">Submit</button>
 
 
@@ -56,8 +60,8 @@
           var mydiv = document.getElementById("toappend");
           if(value == 'dog')
           {
-            var content = '<br><div class="form-group"><label for="size">Size of Dog</label><input class="form-control" type ="text" id="size" name="size" placeholder="Enter the size big/small/medium"></div>';
-            var content2  ='<div class="form-group"><label for="temper">temper</label><input class="form-control" type ="text" id="temper" name="temper" placeholder="Temper of your dog"></div>';
+            var content = '<br><div class="form-group"><label for="size">Size of Dog</label><input class="form-control" type ="text" id="size" name="size" placeholder="Enter the size big/small/medium" required></div>';
+            var content2  ='<div class="form-group"><label for="temper">temper</label><input class="form-control" type ="text" id="temper" name="temper" placeholder="Temper of your dog" required></div>';
             mydiv.innerHTML += content;
             mydiv.innerHTML += content2;
 
