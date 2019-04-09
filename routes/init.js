@@ -26,6 +26,7 @@ function initRouter(app) {
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
 	app.get('/getpet', passport.authMiddleware(), getpet);
+	app.get('/setsession', passport.authMiddleware(), setsession);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 
 	/* PROTECTED POST */
@@ -40,7 +41,7 @@ function initRouter(app) {
 	app.post('/postpet', passport.authMiddleware(), postpet);
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
-		successRedirect: '/login',
+		successRedirect: '/setsession',
 		failureRedirect: '/login'
 	}));
 
@@ -49,7 +50,8 @@ function initRouter(app) {
 }
 
 
-
+////res.session.status variable defined 
+//// value : none / caretaker / owmner / both
 
 ///Still not used
 function basic(req, res, page, other) {
@@ -70,10 +72,17 @@ function basic(req, res, page, other) {
 
 
 
+
+
+
 ///home
 function index(req, res, next) {
+	console.log(req.session.status);
 	res.render('index', { title: 'Express' });
 }
+
+
+
 
 
 
@@ -104,6 +113,111 @@ function postlist(req, res, next) {
 }
 
 
+function caretaker(req, res, next) {
+	res.render('/caretaker', {
+		title: 'Find Services'
+	});
+}
+
+
+function getpet(req, res, next) {
+	// console.log("inside get pettttt" + req.session.status);
+	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+		res.render('addpet', { page: 'addpet', title: 'Add Pet' });
+}
+
+function postpet(req, res, next) {
+	
+	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		console.log(req.body.catordog);
+	// console.log(req.user);
+	var sql_query = 'BEGIN; INSERT INTO petowned VALUES';
+	var id  = req.user.username;
+	var genid = uuidv4();
+	console.log(genid+"::::::::genid");
+	// var name    = req.user.Name;
+	// var password = req.user.password;
+	sql_query = sql_query+"('"+genid+"','"+req.body.pname+"','"+id+"','"+req.body.age+"');";
+
+	if(req.body.catordog == 'dog')
+	{
+		var pet_query = 'INSERT INTO dog VALUES';
+		pet_query = pet_query+ "('"+genid+"','"+id+"','"+req.body.size+"','"+req.body.breed+"','"+req.body.temper+"')";
+	}
+	else if(req.body.catordog == 'cat')
+	{
+		var pet_query = 'INSERT INTO cat VALUES';
+		pet_query = pet_query+ "('"+genid+"','"+id+ "','"+ req.body.breed+"')";
+	}
+	console.log("yoyooyoyoyoyoyoyooyoy" + pet_query);
+
+	sql_query = sql_query + pet_query + ";END;";
+	console.log(sql_query);
+	  pool.query(sql_query,function(err,result){
+		if(err)
+			console.log(err);
+		else {
+			console.log(result);
+			res.redirect('/');
+			return;
+		}
+	});
+	}
+}
+
+
+
+//Adding to caretaker or owner table
+function becomeOwner(req, res, next) {
+
+
+	// if(res.session == )
+
+	var insert_query = 'INSERT INTO owner VALUES' + "('" + req.user.username + "')";
+	// console.log(req.user);
+	console.log(req.user.username);
+	// insert_query
+	pool.query(insert_query, function (err, result) {
+		if (err) { console.log(err); }
+		else {
+			console.log(result)
+			res.redirect('/');
+			return;
+		}
+	});
+	// res.redirect('/login');
+}
+
+function becomeCaretaker(req, res, next) {
+	var insert_query = 'INSERT INTO caretaker VALUES' + "('" + req.user.username + "')";
+	// console.log(req.user);
+	console.log(req.user.username);
+	// insert_query
+	pool.query(insert_query, function (err, result) {
+		if (err) {
+			console.log(err);
+			res.redirect('/');
+			return;
+		}
+		else {
+			console.log(result)
+			res.redirect('/');
+			return;
+		}
+	});
+	// res.redirect('/login');
+}
 
 
 //Adding User
@@ -162,6 +276,8 @@ function reg_user(req, res, next) {
 }
 
 
+
+
 function getlogin(req, res, next) {
 	res.render('login', {
 		page: 'login', auth: false, title: 'Login',
@@ -173,98 +289,45 @@ function getlogin(req, res, next) {
 }
 
 
+function setsession(req,res,next){
+	console.log(req.user);
+	ssn=req.session;
+	var stat = 'none';
+	var query1="BEGIN; select 1 from owner where ownerId = '"+req.user.username+"';";
+	var query2 = "select 1 from caretaker where caretakerId = '"+req.user.username+"'; END;";
+	console.log(query1+query2);
+	console.log("we weree on a break");
+	pool.query(query1+query2,function(err, result){
+		console.log(result);
+		if(err)
+			console.log(err);
+		else{
+			if(result[1].rows.length==1)
+			{
+				stat = 'owner';
+			}
+			if(result[2].rows.length == 1)
+			{
+				if( stat == 'owner')
+					stat = 'both';
+				else
+					stat = 'caretaker';
+			}
+			ssn.status = stat;
+			console.log(ssn.status);
+			res.redirect('/'); 
+		}
+	});
+
+	
+}
+
+
 function logout(req, res, next) {
 	req.session.destroy();
 	req.logout();
 	res.redirect('/');
 }
-
-
-
-//Adding to caretaker or owner table
-function becomeOwner(req, res, next) {
-	var insert_query = 'INSERT INTO owner VALUES' + "('" + req.user.username + "')";
-	// console.log(req.user);
-	console.log(req.user.username);
-	// insert_query
-	pool.query(insert_query, function (err, result) {
-		if (err) { console.log(err); }
-		else {
-			console.log(result)
-			res.redirect('/');
-			return;
-		}
-	});
-	// res.redirect('/login');
-}
-
-function becomeCaretaker(req, res, next) {
-	var insert_query = 'INSERT INTO caretaker VALUES' + "('" + req.user.username + "')";
-	// console.log(req.user);
-	console.log(req.user.username);
-	// insert_query
-	pool.query(insert_query, function (err, result) {
-		if (err) {
-			console.log(err);
-			res.redirect('/');
-			return;
-		}
-		else {
-			console.log(result)
-			res.redirect('/');
-			return;
-		}
-	});
-	// res.redirect('/login');
-}
-
-function caretaker(req, res, next) {
-	res.render('/caretaker', {
-		title: 'Find Services'
-	});
-}
-
-
-function getpet(req, res, next) {
-	res.render('addpet', { page: 'addpet', title: 'Add Pet' });
-}
-
-function postpet(req, res, next) {
-	// console.log(req.body.catordog);
-	// console.log(req.user);
-	var sql_query = 'BEGIN; INSERT INTO petowned VALUES';
-	var id  = req.user.username;
-	var genid = uuidv4();
-	console.log(genid+"::::::::genid");
-	// var name    = req.user.Name;
-	// var password = req.user.password;
-	sql_query = sql_query+"('"+genid+"','"+req.body.pname+"','"+id+"','"+req.body.age+"');";
-
-	if(req.body.catordog == 'dog')
-	{
-		var pet_query = 'INSERT INTO dog VALUES';
-		pet_query = pet_query+ "('"+genid+"','"+id+"','"+req.body.size+"','"+req.body.breed+"','"+req.body.temper+"')";
-	}
-	else if(req.body.catordog == 'cat')
-	{
-		var pet_query = 'INSERT INTO cat VALUES';
-		pet_query = pet_query+ "('"+genid+"','"+id+ "','"+ req.body.breed+"')";
-	}
-	console.log("yoyooyoyoyoyoyoyooyoy" + pet_query);
-
-	sql_query = sql_query + pet_query + ";END;";
-	console.log(sql_query);
-	  pool.query(sql_query,function(err,result){
-		if(err)
-			console.log(err);
-		else {
-			console.log(result);
-			res.redirect('/');
-			return;
-		}
-	});
-}
-
 
 module.exports = initRouter;
 
