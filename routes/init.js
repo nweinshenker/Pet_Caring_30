@@ -405,6 +405,7 @@ function getcare(req, res, next) {
 
 function findcare (req, res, next) {
 	var body = req.body;
+	console.log(req.body);
 	var date = body.day;
 	var tbl = [];
 	var base;
@@ -424,7 +425,7 @@ function findcare (req, res, next) {
 		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl });
 	});
 	
-	console.log(dateValue);
+	// console.log(dateValue);
 
 	// var list_query = "SELECT caretakerId, serviceId, selectedDate FROM CARES where selectedDate" = 'dateValue';
 
