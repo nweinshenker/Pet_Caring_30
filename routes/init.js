@@ -2,16 +2,10 @@
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const uuidv4 = require('uuid/v4');
-// Postgre SQL Connection
+// Postgres SQL Connection
 const { Pool } = require('pg');
 const pool = new Pool({
-	// user: 'tarush',
-	// host: 'localhost',
-	// database: 'postgres',
-	// password: 'postgres',
-	// port: 5432,
-	connectionString: process.env.DATABASE_URL,
-	// ssl: true
+	connectionString: process.env.DATABASE_URL
 });
 
 const round = 10;
@@ -54,6 +48,8 @@ function initRouter(app) {
 	app.post('/reg_user', passport.antiMiddleware(), reg_user);
 	/* LOGOUT */
 	app.get('/logout', passport.authMiddleware(), logout);
+	app.get('/getbid', passport.authMiddleware(), getbid);
+	app.post('/postbid', passport.authMiddleware(), postbid);
 }
 
 
@@ -161,9 +157,9 @@ function getlist(req,res,next){
 	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
+
 	{
 		var provided_services= "select P.serviceId as serviceId, S.name as name from (caretaker C natural join provides P) natural join services S where C.caretakerId ='"+req.user.username+"'"
 		// service_query= 'Select * from services where '
@@ -184,14 +180,14 @@ function getlist(req,res,next){
 		
 	}
 
+
 }
 
 function postlist(req, res, next) {
 	// console.log('hahahahaha');
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 	{
@@ -210,7 +206,6 @@ function postlist(req, res, next) {
 			else {
 				console.log(result);
 				res.redirect('/');
-				return;
 			}
 		});
 	}
@@ -268,10 +263,9 @@ function ownerprofile(req,res,next){
 
 function getpet(req, res, next) {
 	// console.log("inside get pettttt" + req.session.status);
-	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 		res.render('addpet', { page: 'addpet', title: 'Add Pet' });
@@ -279,10 +273,9 @@ function getpet(req, res, next) {
 
 function postpet(req, res, next) {
 	
-	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 	{
@@ -296,12 +289,12 @@ function postpet(req, res, next) {
 	// var password = req.user.password;
 	sql_query = sql_query+"('"+genid+"','"+req.body.pname+"','"+id+"','"+req.body.age+"');";
 
-	if(req.body.catordog == 'dog')
+	if(req.body.catordog === 'dog')
 	{
 		var pet_query = 'INSERT INTO dog VALUES';
 		pet_query = pet_query+ "('"+genid+"','"+id+"','"+req.body.size+"','"+req.body.breed+"','"+req.body.temper+"')";
 	}
-	else if(req.body.catordog == 'cat')
+	else if(req.body.catordog === 'cat')
 	{
 		var pet_query = 'INSERT INTO cat VALUES';
 		pet_query = pet_query+ "('"+genid+"','"+id+ "','"+ req.body.breed+"')";
@@ -316,7 +309,6 @@ function postpet(req, res, next) {
 		else {
 			console.log(result);
 			res.redirect('/');
-			return;
 		}
 	});
 	}
@@ -330,7 +322,7 @@ function becomeOwner(req, res, next) {
 
 	// if(res.session == )
 
-	var insert_query = 'INSERT INTO owner VALUES' + "('" + req.user.username + "')";
+	var insert_query = `INSERT INTO owner VALUES('${req.user.username}')`;
 	// console.log(req.user);
 	console.log(req.user.username);
 	// insert_query
@@ -342,16 +334,15 @@ function becomeOwner(req, res, next) {
 			return;
 		}
 		else {
-			console.log(result)
+			console.log(result);
 			res.redirect('/');
-			return;
 		}
 	});
 	// res.redirect('/login');
 }
 
 function becomeCaretaker(req, res, next) {
-	var insert_query = 'INSERT INTO caretaker VALUES' + "('" + req.user.username + "')";
+	var insert_query = `INSERT INTO caretaker VALUES('${req.user.username}')`;
 	// console.log(req.user);
 	console.log(req.user.username);
 	// insert_query
@@ -359,12 +350,10 @@ function becomeCaretaker(req, res, next) {
 		if (err) {
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
-			console.log(result)
+			console.log(result);
 			res.redirect('/');
-			return;
 		}
 	});
 	// res.redirect('/login');
@@ -399,7 +388,7 @@ function reg_user(req, res, next) {
 	var id = req.body.emailid;
 	var name = req.body.Name;
 	var password = req.body.password;
-	var check_query = 'SELECT userid FROM users WHERE userid=' + "'" + id + "'";
+	var check_query = `SELECT userid FROM users WHERE userid='${id}'`;
 	console.log(check_query);
 	var pwd = bcrypt.hashSync(req.body.password, salt);
 	console.log(pwd);
@@ -416,10 +405,9 @@ function reg_user(req, res, next) {
 				if (err) { console.log(err); }
 				else {
 					// client.query('COMMIT')
-					console.log(result)
-					req.flash('success', 'User created.')
+					console.log(result);
+					req.flash('success', 'User created.');
 					res.redirect('/login');
-					return;
 				}
 			});
 		}
@@ -463,13 +451,13 @@ function setsession(req,res,next){
 		if(err)
 			console.log(err);
 		else{
-			if(result[1].rows.length==1)
+			if(result[1].rows.length===1)
 			{
 				stat = 'owner';
 			}
-			if(result[2].rows.length == 1)
+			if(result[2].rows.length === 1)
 			{
-				if( stat == 'owner')
+				if( stat ==='owner')
 					stat = 'both';
 				else
 					stat = 'caretaker';
@@ -488,6 +476,32 @@ function logout(req, res, next) {
 	req.session.destroy();
 	req.logout();
 	res.redirect('/');
+}
+
+function getbid(req,res){
+	if (req.session.status === 'caretaker' || req.session.status === 'none')
+	{
+		res.redirect('/');
+	}
+	else
+	{
+		res.render('bid',{
+			page : 'bid',
+			title: 'Bidding'
+		});
+	}
+}
+
+function postbid(req,res){
+	if (req.session.status === 'caretaker' || req.session.status === 'none')
+	{
+		res.redirect('/');
+	}
+	else
+	{
+		console.log(req.body);
+		console
+	}
 }
 
 module.exports = initRouter;
