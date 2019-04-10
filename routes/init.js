@@ -22,6 +22,7 @@ function initRouter(app) {
 	/* List all CareTakers in a Table */
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.get('/findcare', passport.authMiddleware(), findcare);
+	
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
 	// app.post('/update_pass', passport.authMiddleware(), update_pass);
@@ -175,10 +176,6 @@ function getpet(req, res, next) {
 		});
 	}
 }
-
- 
-
-
 
 function getpet(req, res, next) {
 	// console.log("inside get pettttt" + req.session.status);
