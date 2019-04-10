@@ -30,6 +30,13 @@
                 <label for="price">Min. Price</label>
                 <input type="number" step="1" class="form-control" name="price" id="price" placeholder="Enter your Base Price">
             </div>
+            <div class="form-group">
+            <select class="browser-default custom-select" id="service" name="service" required>
+            <option value="">Please Select Cat or Dog</option>
+            <% for( var i in services ) {%>
+                <option value="<%= services[i].serviceid %>" > <%= services[i].name %></option>
+            <% } %>
+            </select>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
 

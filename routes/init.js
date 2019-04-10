@@ -22,31 +22,36 @@ function initRouter(app) {
 	app.get('/', index);
 	app.get('/register', passport.antiMiddleware(), register);
 	app.get('/login', passport.antiMiddleware(), getlogin);
+	app.get('/setsession', passport.authMiddleware(), setsession);
+
+	///    ONWER 
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
+	app.get('/getpet', passport.authMiddleware(), getpet);
+	app.get('/owner', passport.authMiddleware(), ownerprofile);
+	app.get('/findsitter',passport.authMiddleware(), getsitter);
+	
+
+
+	app.post('/postpet', passport.authMiddleware(), postpet);
+
+	//////////////////////////////////////
+	//    CARETAKER
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
-	app.get('/getpet', passport.authMiddleware(), getpet);
-	app.get('/setsession', passport.authMiddleware(), setsession);
-	// app.get('/password' , passport.antiMiddleware(), retrieve );
-
-	app.get('/findsitter',passport.authMiddleware(), getsitter);
-
-	/* PROTECTED POST */
-	// app.post('/update_info', passport.authMiddleware(), update_info);
-	// app.post('/update_pass', passport.authMiddleware(), update_pass);
-	// app.post('/add_game'   , passport.authMiddleware(), add_game   );
-	// app.post('/add_play'   , passport.authMiddleware(), add_play   );
+	app.get('/ct/service',passport.authMiddleware(), addservice);
 
 
-	app.post('/reg_user', passport.antiMiddleware(), reg_user);
 	app.post('/postlist', passport.authMiddleware(), postlist);
-	app.post('/postpet', passport.authMiddleware(), postpet);
+	app.post('/ct/postservice', passport.authMiddleware(), postservice);
+	
+	
+	
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
 		successRedirect: '/setsession',
 		failureRedirect: '/login'
 	}));
-
+	app.post('/reg_user', passport.antiMiddleware(), reg_user);
 	/* LOGOUT */
 	app.get('/logout', passport.authMiddleware(), logout);
 }
@@ -84,19 +89,100 @@ function index(req, res, next) {
 }
 
 
+//////CARETAKER FUNCTIONS
 
-
-
-
-/////Adding availability in table list
-function getlist(req,res,next){
+function addservice(req,res,next){
 	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
 	{	
 		res.redirect('/');
 		return;
 	}
 	else
-	res.render('list', { page: 'list' , title: 'Login' });
+	{
+		find_all_services = "SELECT * from services S1 where S1.serviceId not in (select distinct P.serviceID from caretaker C natural join provides P where C.caretakerId ='"+req.user.username+"')";
+		pool.query(find_all_services, function(err,result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				res.render('addservice',{ page: 'addservice', title: 'Add Service', services: result.rows});
+			}
+		});
+	}
+}
+
+function postservice(req,res,next){
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		console.log(req.body);
+		var len = req.body.length;
+		add_provides ="BEGIN;";
+		for( var i =0; i<len;i++)
+		{
+			// var ch = toString(i);
+			// console.log(ch +" :: after ch :: " + req.body[i] );
+			if(i in req.body)
+			{
+				add_provides += "INSERT into provides values ('"+req.user.username+"','"+req.body[i]+"');";
+			}
+		}
+		add_provides+="END;";
+		console.log(add_provides);
+		pool.query(add_provides, function(err,result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				console.log(result);
+				res.redirect('/');
+				return;
+			}
+		});
+		
+	}
+}
+
+/////Adding availability in table list
+function getlist(req,res,next){
+	// console.log(req.session.status);
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		var provided_services= "select P.serviceId as serviceId, S.name as name from (caretaker C natural join provides P) natural join services S where C.caretakerId ='"+req.user.username+"'"
+		// service_query= 'Select * from services where '
+		pool.query(provided_services, function(err,result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				res.render('list', { page: 'list' , title: 'Add Availability' , services: result.rows});
+			}
+		});
+		// console.log(provided_services);
+		// console.log(":::::"+provided_services[1].name);
+		
+	}
 
 }
 
@@ -109,15 +195,18 @@ function postlist(req, res, next) {
 	}
 	else
 	{
+		var genid = uuidv4();
 		console.log(req.user);
 		var sql_query = 'INSERT INTO list VALUES';
 		var id = req.user.username;
-		// var name    = req.user.Name;
-		// var password = req.user.password;
-		sql_query = sql_query + "('" + id + "','" + req.body.day + "','" + req.body.price + "')";
+		//check for services
+		sql_query = sql_query + "('" + genid + "','" +id + "','"+ req.body.service+ "','" + req.body.price+ "','" + req.body.day  + "')";
 		pool.query(sql_query, function (err, result) {
-			if (err)
+			if (err){
 				console.log(err);
+				res.redirect('/');
+				return;
+			}
 			else {
 				console.log(result);
 				res.redirect('/');
@@ -134,6 +223,47 @@ function caretaker(req, res, next) {
 		title: 'Find Services'
 	});
 }
+
+
+//////////OWNER FUNCTIONS
+
+function ownerprofile(req,res,next){
+	console.log(req.session);
+	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	{	
+		console.log('not a owner yet');
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		search_pet = "BEGIN;";
+		search_pet += "Select * from petowned P natural join cat C where P.ownerId = '"+req.user.username+"';";
+		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
+		search_pet += "END;"
+		console.log("search_pet::::::::::::::::::"+search_pet);
+		pool.query(search_pet , function (err, result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				var dogs = result[2].rows;
+				var cats = result[1].rows;
+				console.log(dogs)
+				console.log(cats);
+				console.log(cats[0].petnum);
+				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
+			}
+		});
+	}
+}
+
+ 
+
 
 
 function getpet(req, res, next) {
@@ -205,7 +335,12 @@ function becomeOwner(req, res, next) {
 	console.log(req.user.username);
 	// insert_query
 	pool.query(insert_query, function (err, result) {
-		if (err) { console.log(err); }
+		if (err) 
+		{ 
+			console.log(err);
+			res.redirect('/');
+			return;
+		}
 		else {
 			console.log(result)
 			res.redirect('/');
