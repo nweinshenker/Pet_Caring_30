@@ -114,9 +114,7 @@ create table bid
     listId varchar(50) references list(listId),
     price integer not null,
     petNum varchar(50) references petowned(petnum),
-    primary key(ownerId, listId)
---petNum in primary key?
---add trigger to remove previous bid from the user.
+    primary key(ownerId, listId, price)
 );
 
 

@@ -96,8 +96,12 @@ insert into athome values ('2'),
 
 insert into notathome values ('1');
 
-insert into bid values ('nathan@gmail.com','1',100,''),
-                       ('nathan@gmail.com','3',95,''),
-                       ('nathan@gmail.com','3',99,''),
-                       ('nathan@gmail.com','11',100,''),
-                       ;
+insert into bid values ('nathan@gmail.com','1',100,'1'),
+                       ('nathan@gmail.com','3',95,'2'),
+                       ('nathan@gmail.com','3',99,'1'),
+                       ('nathan@gmail.com','11',100,'2'),
+                       ('ed@gmail.com','20',90,'4'),
+                       ('ed@gmail.com','12',80,'4'),
+                       ('blackwidow@gmail.com','11',110,'5'),
+                       ('blackwidow@gmail.com','10',100,'6'),
+                       ('blackwidow@gmail.com','9',100,'7');
