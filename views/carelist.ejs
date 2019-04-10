@@ -31,20 +31,15 @@
 
     <div class="wrapper">
 
-    <form id="html_form" action="listCaretakers" role="form" method="get">
+    <form id="html_form" method="post" action="/findCare">
     
         <div class="form-group">
             <label for="day">Day</label>
             <input class="form-control" type="text" id="day" name="day" placeholder="Enter the day">
         </div>
-        <button type="submit" class="btn btn-primary">Find Available CareTakers</button>
-        <div class="form-group">
-            <label for="price">Min. Price</label>
-            <input type="number" step="1" class="form-control" name="price" id="price" placeholder="Enter your Base Price">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="hidden" id="myButton" class="btn btn-primary" >Find Available CareTakers</button>
     </form>
-    </div>
+
 
     <div class="card mb-3">
         <div class="card-header">
@@ -74,6 +69,7 @@
         </div>
         <div class="card-footer small text-muted"><span class="badge badge-pill badge-info"></span></div>
     </div>
+    
 
 
 

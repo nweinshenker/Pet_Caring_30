@@ -29,9 +29,10 @@ function initRouter(app) {
 	app.get('/setsession', passport.authMiddleware(), setsession);
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 
-	app.get('/findsitter',passport.authMiddleware(), getsitter);
+	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
 	app.get('/getcare', passport.authMiddleware(), getcare);
+	app.get('/findcare', passport.authMiddleware(), findcare);
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
 	// app.post('/update_pass', passport.authMiddleware(), update_pass);
@@ -343,9 +344,9 @@ function getcare(req, res, next) {
 		return;
 	}
 	var tbl = [];
-	var base;
 	var query = 'SELECT * FROM caretaker';
 	pool.query(query, (err, data) => {
+		console.log(data)
 		// tbl = data;
 		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
@@ -357,13 +358,26 @@ function getcare(req, res, next) {
 	});
 }
 
-function findDate (req, res, next) {
-	var date = document.querySelector('#day').value;
+function findcare (req, res, next) {
+	var body = req.body;
+	var date = body.day;
 	var tbl = [];
+	var base;
+	var query = 'SELECT C.caretakerid from C cares where C.selected_date =' + date + '';
 
-	
-	var query1 = "BEGIN; select 1 from owner where ownerId = '" + req.user.username + "';";
-	var query2 = "select 1 from caretaker where caretakerId = '" + req.user.username + "'; END;";
+	console.log(query);
+
+	pool.query(query, (err, data) => {
+		console.log(data)
+		if (err || !data.rows || data.rows.length == 0) {
+			tbl = [];
+			base = false;
+		} else {
+			tbl = data.rows;
+			base = true;
+		}
+		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl });
+	});
 	
 	console.log(dateValue);
 
