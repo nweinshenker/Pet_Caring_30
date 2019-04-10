@@ -30,7 +30,8 @@ function initRouter(app) {
 	// app.get('/password' , passport.antiMiddleware(), retrieve );
 
 	app.get('/findsitter',passport.authMiddleware(), getsitter);
-
+	/* List all CareTakers in a Table */
+	app.get('/getcare', passport.authMiddleware(), getcare);
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
 	// app.post('/update_pass', passport.authMiddleware(), update_pass);
@@ -41,6 +42,9 @@ function initRouter(app) {
 	app.post('/reg_user', passport.antiMiddleware(), reg_user);
 	app.post('/postlist', passport.authMiddleware(), postlist);
 	app.post('/postpet', passport.authMiddleware(), postpet);
+	
+
+
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
 		successRedirect: '/setsession',
@@ -84,10 +88,6 @@ function index(req, res, next) {
 }
 
 
-
-
-
-
 /////Adding availability in table list
 function getlist(req,res,next){
 	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
@@ -126,13 +126,6 @@ function postlist(req, res, next) {
 		});
 	}
 	// res.redirect('/');
-}
-
-
-function caretaker(req, res, next) {
-	res.render('/caretaker', {
-		title: 'Find Services'
-	});
 }
 
 
@@ -236,16 +229,6 @@ function becomeCaretaker(req, res, next) {
 }
 
 
-function getsitter(req, res, next) {
-	res.render('findsitter', {
-		page: 'findsitter', auth: false, title: 'Finding a Sitter',
-		messages: {
-			danger: req.flash('danger'),
-			warning: req.flash('warning'), success: req.flash('success')
-		}
-	});
-}
-
 //Adding User
 function register(req, res, next) {
 	res.render('register', {
@@ -347,6 +330,50 @@ function setsession(req,res,next){
 
 	
 }
+
+/** CARETAKER FUNCTIONALITY
+ * 1. LISTS OUT ALL CARETAKERS 
+ * 2. ACQUIRE ALL CARETAKERS ON A GIVEN DAY
+ * 3. POST A BID FOR A CARETAKER
+ **/
+
+function getcare(req, res, next) {
+	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+		res.redirect('/');
+		return;
+	}
+	var tbl = [];
+	var base;
+	var query = 'SELECT * FROM caretaker';
+	pool.query(query, (err, data) => {
+		// tbl = data;
+		// console.log(tbl);
+		if (err || !data.rows || data.rows.length == 0) {
+			tbl = [];
+		} else {
+			tbl = data.rows;
+		}
+		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl});
+	});
+}
+
+function findDate (req, res, next) {
+	var date = document.querySelector('#day').value;
+	var tbl = [];
+
+	
+	var query1 = "BEGIN; select 1 from owner where ownerId = '" + req.user.username + "';";
+	var query2 = "select 1 from caretaker where caretakerId = '" + req.user.username + "'; END;";
+	
+	console.log(dateValue);
+
+	// var list_query = "SELECT caretakerId, serviceId, selectedDate FROM CARES where selectedDate" = 'dateValue';
+
+}
+
+
+
+
 
 
 function logout(req, res, next) {
