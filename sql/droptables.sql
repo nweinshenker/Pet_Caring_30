@@ -8,6 +8,6 @@ drop table services cascade;
 drop table list cascade;
 drop table provides cascade;
 drop table cares cascade;
-drop table athome cascade;
-drop table notathome cascade;
+drop table catservices cascade;
+drop table dogservices cascade;
 drop table bid cascade;

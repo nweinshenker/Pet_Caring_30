@@ -88,13 +88,21 @@ insert into provides values ('caroline@gmail.com','2'),
                             ('tyrion@gmail.com','2'),
                             ('tyrion@gmail.com','4');
 
-insert into cares values ('','','','',,to_date(),'');
+insert into cares values ('caroline@gmail.com','2',to_date('16 04 2019','DD MM YYYY'),'1','1','nathan@gmail.com',100,'Recommended'),
+                         ('caroline@gmail.com','4',to_date('17 04 2019','DD MM YYYY'),'3','1','nathan@gmail.com',99,NULL),
+                         ('tyrion@gmail.com','3',to_date('17 04 2019','DD MM YYYY'),'20','4','ed@gmail.com',90,'It was really nice. He is very professional does not drink on the job'),
+                         ('ben@gmail.com','3',to_date('18 04 2019','DD MM YYYY'),'12','4','ed@gmail.com',80,NULL),
+                         ('div@gmail.com','2',to_date('18 04 2019','DD MM YYYY'),'11','5','blackwidow@gmail.com',110,NULL),
+                         ('div@gmail.com','1',to_date('17 04 2019','DD MM YYYY'),'10','6','blackwidow@gmail.com',100,'Nice'),
+                         ('div@gmail.com','1',to_date('18 04 2019','DD MM YYYY'),'9','7','blackwidow@gmail.com',100,NULL);
 
-insert into athome values ('2'),
+insert into catservices values ('2'),
                           ('3'),
                           ('4');
 
-insert into notathome values ('1');
+insert into dogservices values ('1'),
+                               ('2'),
+                               ('4');
 
 insert into bid values ('nathan@gmail.com','1',100,'1'),
                        ('nathan@gmail.com','3',95,'2'),
