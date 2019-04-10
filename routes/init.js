@@ -17,9 +17,18 @@ function initRouter(app) {
 	app.get('/register', passport.antiMiddleware(), register);
 	app.get('/login', passport.antiMiddleware(), getlogin);
 	app.get('/setsession', passport.authMiddleware(), setsession);
+	
 
+
+	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
+	app.get('/getpet', passport.authMiddleware(), getpet);
+	app.get('/owner', passport.authMiddleware(), ownerprofile);
+	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
+	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
+	app.get('/getlist', passport.authMiddleware(), getlist);
+	app.get('/ct/service',passport.authMiddleware(), addservice);
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.get('/findcare', passport.authMiddleware(), findcare);
 	
@@ -32,7 +41,7 @@ function initRouter(app) {
 
 	app.post('/postlist', passport.authMiddleware(), postlist);
 	app.post('/postpet', passport.authMiddleware(), postpet);
-	
+	app.post('/ct/postservice', passport.authMiddleware(), postservice);
 
 
 	/* LOGIN */
@@ -79,6 +88,71 @@ function index(req, res, next) {
 	res.render('index', { title: 'Express' });
 }
 
+
+function addservice(req,res,next){
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		find_all_services = "SELECT * from services S1 where S1.serviceId not in (select distinct P.serviceID from caretaker C natural join provides P where C.caretakerId ='"+req.user.username+"')";
+		pool.query(find_all_services, function(err,result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				res.render('addservice',{ page: 'addservice', title: 'Add Service', services: result.rows});
+			}
+		});
+	}
+}
+
+
+function postservice(req,res,next){
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		console.log(req.body);
+		var len = req.body.length;
+		add_provides ="BEGIN;";
+		for( var i =0; i<len;i++)
+		{
+			// var ch = toString(i);
+			// console.log(ch +" :: after ch :: " + req.body[i] );
+			if(i in req.body)
+			{
+				add_provides += "INSERT into provides values ('"+req.user.username+"','"+req.body[i]+"');";
+			}
+		}
+		add_provides+="END;";
+		console.log(add_provides);
+		pool.query(add_provides, function(err,result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				console.log(result);
+				res.redirect('/');
+				return;
+			}
+		});
+
+	}
+}
 
 /////Adding availability in table list
 function getlist(req,res,next){
@@ -142,7 +216,7 @@ function postlist(req, res, next) {
 }
 
 
-function getpet(req, res, next) {
+function ownerprofile(req, res, next) {
 	// console.log("inside get pettttt" + req.session.status);
 	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
 	{	
