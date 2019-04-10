@@ -18,7 +18,6 @@ function initRouter(app) {
 	app.get('/login', passport.antiMiddleware(), getlogin);
 	app.get('/setsession', passport.authMiddleware(), setsession);
 
-<<<<<<< HEAD
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
 	app.get('/getcare', passport.authMiddleware(), getcare);
@@ -28,37 +27,13 @@ function initRouter(app) {
 	// app.post('/update_pass', passport.authMiddleware(), update_pass);
 	// app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	// app.post('/add_play'   , passport.authMiddleware(), add_play   );
-=======
-	///    ONWER 
-	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
-	app.get('/getpet', passport.authMiddleware(), getpet);
-	app.get('/owner', passport.authMiddleware(), ownerprofile);
-	app.get('/findsitter',passport.authMiddleware(), getsitter);
-	
-
-
-	app.post('/postpet', passport.authMiddleware(), postpet);
-
-	//////////////////////////////////////
-	//    CARETAKER
-	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
-	app.get('/getlist', passport.authMiddleware(), getlist);
-	app.get('/ct/service',passport.authMiddleware(), addservice);
->>>>>>> f3a69d35e8f30381b356daa49b6de252ac01727d
 
 
 	app.post('/postlist', passport.authMiddleware(), postlist);
-<<<<<<< HEAD
 	app.post('/postpet', passport.authMiddleware(), postpet);
 	
 
 
-=======
-	app.post('/ct/postservice', passport.authMiddleware(), postservice);
-	
-	
-	
->>>>>>> f3a69d35e8f30381b356daa49b6de252ac01727d
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
 		successRedirect: '/setsession',
@@ -104,75 +79,6 @@ function index(req, res, next) {
 }
 
 
-<<<<<<< HEAD
-=======
-//////CARETAKER FUNCTIONS
-
-function addservice(req,res,next){
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
-	{	
-		res.redirect('/');
-		return;
-	}
-	else
-	{
-		find_all_services = "SELECT * from services S1 where S1.serviceId not in (select distinct P.serviceID from caretaker C natural join provides P where C.caretakerId ='"+req.user.username+"')";
-		pool.query(find_all_services, function(err,result){
-			if(err)
-			{
-				console.log(err);
-				res.redirect('/');
-				return;
-			}
-			else
-			{
-				res.render('addservice',{ page: 'addservice', title: 'Add Service', services: result.rows});
-			}
-		});
-	}
-}
-
-function postservice(req,res,next){
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
-	{	
-		res.redirect('/');
-		return;
-	}
-	else
-	{
-		console.log(req.body);
-		var len = req.body.length;
-		add_provides ="BEGIN;";
-		for( var i =0; i<len;i++)
-		{
-			// var ch = toString(i);
-			// console.log(ch +" :: after ch :: " + req.body[i] );
-			if(i in req.body)
-			{
-				add_provides += "INSERT into provides values ('"+req.user.username+"','"+req.body[i]+"');";
-			}
-		}
-		add_provides+="END;";
-		console.log(add_provides);
-		pool.query(add_provides, function(err,result){
-			if(err)
-			{
-				console.log(err);
-				res.redirect('/');
-				return;
-			}
-			else
-			{
-				console.log(result);
-				res.redirect('/');
-				return;
-			}
-		});
-		
-	}
-}
-
->>>>>>> f3a69d35e8f30381b356daa49b6de252ac01727d
 /////Adding availability in table list
 function getlist(req,res,next){
 	// console.log(req.session.status);
@@ -235,22 +141,8 @@ function postlist(req, res, next) {
 }
 
 
-<<<<<<< HEAD
 function getpet(req, res, next) {
 	// console.log("inside get pettttt" + req.session.status);
-=======
-function caretaker(req, res, next) {
-	res.render('/caretaker', {
-		title: 'Find Services'
-	});
-}
-
-
-//////////OWNER FUNCTIONS
-
-function ownerprofile(req,res,next){
-	console.log(req.session);
->>>>>>> f3a69d35e8f30381b356daa49b6de252ac01727d
 	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
 	{	
 		console.log('not a owner yet');
