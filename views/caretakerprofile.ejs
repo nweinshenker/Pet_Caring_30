@@ -2,7 +2,7 @@
 <html>
   <head>
 		<!-- Page Title -->
-    <title>Owner</title>
+    <title>Caretaker</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
 		
 		<!-- CSS for Styling -->
@@ -14,34 +14,33 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
 		<!-- ADDED JavaScript -->
-		<script src="javascripts/signupScript.js"></script>
+		<!-- <script src="javascripts/signupScript.js"></script> -->
   </head>
 
 
 <body>
     <h1><%= title%></h1>
-    <% if (cats.length > 0) { %>
-    <h3>your cats</h3>
+    <% if (lists.length > 0) { %>
+    <h3>Your Advertised Availabilities</h3>
+    <h6>  Service Name                  Base Price                  Day</h6>
     <ol>
-    	<% for( var i in cats ) {%>
-    	<li><%= cats[i].name %></li>
+    	<% for( var i in lists ) {%>
+    	<li>     <%= lists[i].name %>                  <%= lists[i].baseprice%>                  <%= lists[i].available_dates%></li>
     	<% } %>
     </ol>
     <br>
     <br>
        <% } %>
-    <% if (dogs.length > 0) { %>
-    <h3>your dogs</h3>
+    <% if (skills.length > 0) { %>
+    <h3>Your Skills</h3>
     <ol>
-    	<% for( var i in dogs ) {%>
-    	<li><%= dogs[i].name %></li>
-    	<% } %>
+        <% for( var i in skills ) {%>
+        <li><%= skills[i].name %></li>
+        <% } %>
     </ol>
     <% } %>
-    <a href="getpet">ADD PET</a><br>
-    <a href="deletepet">DELETE PET</a><br>
-    <a href="owner/search">Search for Caretakers</a>
-
+    <a href="getlist">Add Availability</a><br>
+    <a href="ct/service">Add Skills</a>
 
 </body>
 </html>
