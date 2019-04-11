@@ -95,7 +95,7 @@ create table cares
     serviceId varchar(50) references services(serviceId),
     selected_date date not null,
     listId varchar(50) references list(listId),
-    petnum varchar(50) references petowned (petnum),
+    petnum varchar(50) references petowned (petnum) on delete cascade,
     ownerId varchar(50) references owner,
     price integer not null,
     review varchar(100),
@@ -126,7 +126,7 @@ create table bid
     ownerId varchar(50) references owner(ownerId),
     listId varchar(50) references list(listId),
     price integer not null,
-    petNum varchar(50) references petowned(petnum),
+    petNum varchar(50) references petowned(petnum) on delete cascade,
     primary key(ownerId, listId, price)
 );
 

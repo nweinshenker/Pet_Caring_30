@@ -32,20 +32,18 @@ function initRouter(app) {
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
+
+	/* Nathan's function's lol */
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.post('/findcare', passport.authMiddleware(), findcare);
-	
-	/* PROTECTED POST */
-	// app.post('/update_info', passport.authMiddleware(), update_info);
-	// app.post('/update_pass', passport.authMiddleware(), update_pass);
-	// app.post('/add_game'   , passport.authMiddleware(), add_game   );
-	// app.post('/add_play'   , passport.authMiddleware(), add_play   );
-
+	app.get('/getbid', passport.authMiddleware(), getbid);
+	app.post('/postbid', passport.authMiddleware(), postbid);
+	app.get('/deletepet', passport.authMiddleware(), renderdelete);
+	app.post('/postdelete', passport.authMiddleware, postdelete);
 
 	app.post('/postlist', passport.authMiddleware(), postlist);
 	app.post('/postpet', passport.authMiddleware(), postpet);
 	app.post('/ct/postservice', passport.authMiddleware(), postservice);
-
 
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
@@ -55,48 +53,22 @@ function initRouter(app) {
 	app.post('/reg_user', passport.antiMiddleware(), reg_user);
 	/* LOGOUT */
 	app.get('/logout', passport.authMiddleware(), logout);
-	app.get('/getbid', passport.authMiddleware(), getbid);
-	app.post('/postbid', passport.authMiddleware(), postbid);
 }
 
 
 ////res.session.status variable defined 
 //// value : none / caretaker / owmner / both
 
-///Still not used
-function basic(req, res, page, other) {
-	var info = {
-		page: page,
-		user: req.user.username,
-		firstname: req.user.name,
-		// lastname : req.user.lastname,
-		// status   : req.user.status,
-	};
-	if (other) {
-		for (var fld in other) {
-			info[fld] = other[fld];
-		}
-	}
-	res.render(page, info);
-}
-
-
-
-
-
-
 ///home
-function index(req, res, next) {
+function index(req, res) {
 	console.log(req.session.status);
 	res.render('index', { title: 'Express' });
 }
 
-
-function addservice(req,res,next){
+function addservice(req,res){
 	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 	{
@@ -106,7 +78,6 @@ function addservice(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -117,17 +88,16 @@ function addservice(req,res,next){
 }
 
 
-function postservice(req,res,next){
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+function postservice(req,res){
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 	{
 		console.log(req.body);
 		var len = req.body.length;
-		add_provides ="BEGIN;";
+		var add_provides ="BEGIN;";
 		for( var i =0; i<len;i++)
 		{
 			// var ch = toString(i);
@@ -144,13 +114,11 @@ function postservice(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
 				console.log(result);
 				res.redirect('/caretaker');
-				return;
 			}
 		});
 
@@ -158,9 +126,9 @@ function postservice(req,res,next){
 }
 
 /////Adding availability in table list
-function getlist(req,res,next){
+function getlist(req,res){
 	// console.log(req.session.status);
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
 	}
@@ -174,7 +142,6 @@ function getlist(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -189,7 +156,7 @@ function getlist(req,res,next){
 
 }
 
-function postlist(req, res, next) {
+function postlist(req, res) {
 	// console.log('hahahahaha');
 	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
@@ -207,12 +174,10 @@ function postlist(req, res, next) {
 			if (err){
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else {
 				console.log(result);
 				res.redirect('/caretaker');
-				return;
 			}
 		});
 	}
@@ -220,13 +185,12 @@ function postlist(req, res, next) {
 }
 
 
-function ownerprofile(req, res, next) {
+function ownerprofile(req, res) {
 	// console.log("inside get pettttt" + req.session.status);
-	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
 		console.log('not a owner yet');
 		res.redirect('/becomeOwner');
-		return;
 	}
 	else
 	{
@@ -247,7 +211,6 @@ function ownerprofile(req, res, next) {
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -266,12 +229,11 @@ function ownerprofile(req, res, next) {
 
 
 
-function caretakerprofile(req,res,next){
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+function caretakerprofile(req,res){
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		console.log('not a caretaker yet');
 		res.redirect('/becomeCaretaker');
-		return;
 	}
 	else
 	{
@@ -284,7 +246,6 @@ function caretakerprofile(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -310,7 +271,7 @@ function caretakerprofile(req,res,next){
 }
 
 
-function getpet(req, res, next) {
+function getpet(req, res) {
 	// console.log("inside get pettttt" + req.session.status);
 	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
@@ -320,7 +281,7 @@ function getpet(req, res, next) {
 		res.render('addpet', { page: 'addpet', title: 'Add Pet' });
 }
 
-function postpet(req, res, next) {
+function postpet(req, res) {
 	
 	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
@@ -357,12 +318,10 @@ function postpet(req, res, next) {
 		{
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
 			console.log(result);
 			res.redirect('/owner');
-			return;
 		}
 	});
 	}
@@ -371,7 +330,7 @@ function postpet(req, res, next) {
 
 
 //Adding to caretaker or owner table
-function becomeOwner(req, res, next) {
+function becomeOwner(req, res) {
 
 
 	// if(res.session == )
@@ -385,7 +344,6 @@ function becomeOwner(req, res, next) {
 		{ 
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
 			console.log(result);
@@ -395,7 +353,7 @@ function becomeOwner(req, res, next) {
 	// res.redirect('/login');
 }
 
-function becomeCaretaker(req, res, next) {
+function becomeCaretaker(req, res) {
 	var insert_query = `INSERT INTO caretaker VALUES('${req.user.username}')`;
 	// console.log(req.user);
 	console.log(req.user.username);
@@ -404,7 +362,6 @@ function becomeCaretaker(req, res, next) {
 		if (err) {
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
 			console.log(result);
@@ -416,7 +373,7 @@ function becomeCaretaker(req, res, next) {
 
 
 //Adding User
-function register(req, res, next) {
+function register(req, res) {
 	res.render('register', {
 		page: 'register', auth: false, title: 'Owner Sign Up',
 		messages: {
@@ -427,12 +384,11 @@ function register(req, res, next) {
 	console.log(req.flash('warning'));
 }
 
-function reg_user(req, res, next) {
+function reg_user(req, res) {
 	// console.log(auth);
 	var sql_query = 'INSERT INTO users VALUES';
 	var id = req.body.emailid;
 	var name = req.body.Name;
-	var password = req.body.password;
 	var check_query = `SELECT userid FROM users WHERE userid='${id}'`;
 	console.log(check_query);
 	var pwd = bcrypt.hashSync(req.body.password, salt);
@@ -470,9 +426,7 @@ function reg_user(req, res, next) {
 }
 
 
-
-
-function getlogin(req, res, next) {
+function getlogin(req, res) {
 	res.render('login', {
 		page: 'login', auth: false, title: 'Login',
 		messages: {
@@ -483,7 +437,7 @@ function getlogin(req, res, next) {
 }
 
 
-function setsession(req,res,next){
+function setsession(req,res){
 	console.log(req.user);
 	ssn=req.session;
 	var stat = 'none';
@@ -522,16 +476,16 @@ function setsession(req,res,next){
  * 3. POST A BID FOR A CARETAKER
  **/
 
-function getcare(req, res, next) {
-	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+function getcare(req, res) {
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
 		return;
 	}
 	var tbl = [];
-	var query = 'SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C)';
+	var query = 'SELECT L.caretakerid, C.review, L.baseprice, C.selected_date, L.listId from (list L natural join cares C)';
 	console.log(query);
 	pool.query(query, (err, data) => {
-		console.log(data)
+		console.log(data);
 		// tbl = data;
 		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
@@ -539,23 +493,25 @@ function getcare(req, res, next) {
 		} else {
 			tbl = data.rows;
 		}
+		console.log('rendering');
 		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl});
 	});
 }
 
-function findcare (req, res, next) {
+function findcare (req, res) {
 	// console.log(req.body);
 	var date2 = req.body.day;
 	console.log(date2);
+	console.log(req.body);
 	var tbl = [];
 	var base;
-	var query = `SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
+	var query = `SELECT L.caretakerid, C.review,  C.selected_date, L.baseprice, L.listId from (list L natural join cares C) where C.selected_date = to_date('${date2}','MM DD YYYY');`;
 
 	console.log(query);
 
 	pool.query(query, (err, data) => {
 		console.log(data);
-		if (err || !data.rows || data.rows.length == 0) {
+		if (err || !data.rows || data.rows.length === 0) {
 			tbl = [];
 			base = false;
 		} else {
@@ -568,30 +524,65 @@ function findcare (req, res, next) {
 	// console.log(dateValue);
 
 	// var list_query = "SELECT caretakerId, serviceId, selectedDate FROM CARES where selectedDate" = 'dateValue';
+}
 
+/** CARETAKER FUNCTIONALITY
+ * 1. DELETE PETS
+ **/
+
+function renderdelete(req, res) {
+	// console.log("inside get pettttt" + req.session.status);
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
+		res.redirect('/');
+	}
+	else
+		res.render('deletepet', { page: 'deletepet', title: 'Delete Pet' });
+}
+
+function postdelete(req, res) {
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
+		res.redirect('/');
+		return;
+	}
+	var pet_num = req.petnum;
+	console.log(pet_num);
+	var delete_pet = "Delete * from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
+	console.log(delete_pet);
+	pool.query(delete_pet, (err, data) => {
+		if (err) {
+			console.log(err);
+			res.redirect('/');
+			return;
+		}
+		else {
+			console.log(data);
+			res.redirect('/owner');
+			return;
+		}
+	});
 }
 
 
 
-
-
-
-function logout(req, res, next) {
+function logout(req, res) {
 	req.session.destroy();
 	req.logout();
 	res.redirect('/');
 }
 
 function getbid(req,res){
+	console.log('its running');
 	if (req.session.status === 'caretaker' || req.session.status === 'none')
 	{
+		console.log('err');
 		res.redirect('/');
 	}
 	else
 	{
 		res.render('bid',{
 			page : 'bid',
-			title: 'Bidding'
+			title: 'Bidding',
+			listid: req.query.listid
 		});
 	}
 }
@@ -604,14 +595,50 @@ function postbid(req,res){
 	else
 	{
 		console.log(req.body);
-		console
+		console.log(req.user.username);
+		petname=req.body.petname;
+		var query_petnum = `SELECT petnum from petowned where name='${petname}' and ownerId='${req.user.username}';`;
+		console.log(query_petnum);
+		pool.query(query_petnum, function (err,result) {
+			console.log('bsdkkkkk');
+			if(err){
+				console.log('err'+ err);
+			}
+			else{
+				console.log(result);
+				if(result.rows.length > 0) {
+					var insert_query = `INSERT INTO bid VALUES('${req.user.username}','${req.body.listid}','${req.body.price}','${result.rows[0].petnum}')`;
+					pool.query(insert_query, function (err, result) {
+						if (err)
+						{
+							console.log(err);
+							res.redirect('/getcare');
+						}
+						else {
+							if(result.rowCount === 0){
+								res.redirect('/');
+							}
+							console.log(result);
+							res.redirect('/');
+						}
+					});
+				}
+				else{
+					console.log('Invalid name');
+					res.redirect('/getcare');
+				}
+			}
+		});
+
 	}
 }
 
+
 function getreview(req,res,next){
-	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) 
+	{
 		res.redirect('/');
-		return;
 	}
 	else
 	{
@@ -644,7 +671,6 @@ function postreview(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{

@@ -36,13 +36,13 @@
 
     <div class="wrapper">
 
-    <form id="html_form" role="form" method="post" action="/findCare">
+    <form id="html_form" role="form" method="post" action="findcare">
     
         <div class="form-group">
             <label for="day">Day</label>
-            <input id="datepicker" width="276" />
+            <input id="day" class="datepicker" name="day" width="276" />
             <script>
-                $('#datepicker').datepicker({
+                $('.datepicker').datepicker({
                     uiLibrary: 'bootstrap4'
                 });
             </script>
@@ -61,6 +61,7 @@
                     <thead>
                         <tr>
                             <th>CareTake Id</th>
+                            <th>Available Dates</th>
                             <th>Price</th>
                             <th>Review</th>
                         </tr>
@@ -70,18 +71,19 @@
                     <tbody>
                         <% for(var i=0; i<tbl.length; i++) { %>
                         <tr>
-                            <td><%= tbl[i].caretakerid%></td>
-                            <td><%= tbl[i].price%></td>
+                            <td><a href='/getbid?listid=<%=tbl[i].listid%>'> <%= tbl[i].caretakerid%></a></td>
+                            <td><%= tbl[i].selected_date%></td>
+                            <td><%= tbl[i].baseprice%></td>
                             <td><%= tbl[i].review%></td>
                         </tr>
-                        <% } %>
+                        <%}%>
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="card-footer small text-muted"><span class="badge badge-pill badge-info"></span></div>
     </div>
-    
+    </div>
 
 
 
