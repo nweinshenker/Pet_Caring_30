@@ -23,7 +23,7 @@ function initRouter(app) {
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/getpet', passport.authMiddleware(), getpet);
 	app.get('/owner', passport.authMiddleware(), ownerprofile);
-	// app.get('/givereview', passport.authMiddleware(), givereview);
+	app.get('/givereview', passport.authMiddleware(), givereview);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
@@ -585,6 +585,35 @@ function postbid(req,res){
 	{
 		console.log(req.body);
 		console
+	}
+}
+
+function givereview(req,res,next){
+	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		var update_cares = 
+		console.log("search_pet::::::::::::::::::"+search_pet);
+		pool.query(search_pet , function (err, result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				var dogs = result[2].rows;
+				var cats = result[1].rows;
+				console.log(dogs)
+				console.log(cats);
+				// console.log(cats[0].petnum);
+				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
+			}
+		});
 	}
 }
 

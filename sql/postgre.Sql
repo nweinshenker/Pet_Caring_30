@@ -99,7 +99,7 @@ create table cares
     ownerId varchar(50) references owner,
     price integer not null,
     review varchar(100),
-    primary key (caretakerId, petnum, ownerId, serviceId)
+    primary key (listId)
 );
 
 --create table availaibility(
