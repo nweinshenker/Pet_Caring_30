@@ -30,7 +30,7 @@ function initRouter(app) {
 	app.get('/getlist', passport.authMiddleware(), getlist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
 	app.get('/getcare', passport.authMiddleware(), getcare);
-	app.get('/findcare', passport.authMiddleware(), findcare);
+	app.post('/findcare', passport.authMiddleware(), findcare);
 	
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
@@ -479,12 +479,11 @@ function getcare(req, res, next) {
 
 function findcare (req, res, next) {
 	// console.log(req.body);
-	var date = '2019-04-17';
-	var date2 = req.day;
+	var date2 = req.body.day;
 	console.log(date2);
 	var tbl = [];
 	var base;
-	var query = `SELECT C.caretakerid, C1.experience from (cares C natural join caretaker C1) where C.selected_date = '${date}';`;
+	var query = `SELECT C.caretakerid, C1.experience from (cares C natural join caretaker C1) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
 
 	console.log(query);
 
