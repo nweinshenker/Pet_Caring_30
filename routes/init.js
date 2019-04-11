@@ -573,14 +573,19 @@ function postdelete(req, res, next) {
 		return;
 	}
 	var pet_num = req.petnum;
+	console.log(pet_num);
 	var delete_pet = "Delete * from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
 	console.log(delete_pet);
 	pool.query(delete_pet, (err, data) => {
-		if (err)
+		if (err) {
 			console.log(err);
+			res.redirect('/');
+			return;
+		}
 		else {
 			console.log(data);
 			res.redirect('/owner');
+			return;
 		}
 		
 	});
