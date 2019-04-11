@@ -465,7 +465,7 @@ function getcare(req, res, next) {
 	var tbl = [];
 	var query = 'SELECT * FROM caretaker';
 	pool.query(query, (err, data) => {
-		console.log(data)
+		// console.log(data)
 		// tbl = data;
 		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
@@ -478,17 +478,18 @@ function getcare(req, res, next) {
 }
 
 function findcare (req, res, next) {
-	var body = req.body;
-	console.log(req.body);
-	var date = body.day;
+	// console.log(req.body);
+	var date = '2019-04-17';
+	var date2 = req.day;
+	console.log(date2);
 	var tbl = [];
 	var base;
-	var query = 'SELECT C.caretakerid from C cares where C.selected_date =' + date + '';
+	var query = `SELECT C.caretakerid, C1.experience from (cares C natural join caretaker C1) where C.selected_date = '${date}';`;
 
 	console.log(query);
 
 	pool.query(query, (err, data) => {
-		console.log(data)
+		console.log(data);
 		if (err || !data.rows || data.rows.length == 0) {
 			tbl = [];
 			base = false;
