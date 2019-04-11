@@ -22,7 +22,7 @@ function findUser (username, callback) {
 		}
 		
 		if(data.rows.length == 0) {
-			console.error("User does not exists?");
+			console.error("User does not exists");
 			return callback(null)
 		} else if(data.rows.length == 1) {
 			return callback(null, {
@@ -33,7 +33,7 @@ function findUser (username, callback) {
 				// status      : data.rows[0].status
 			});
 		} else {
-			console.error("More than one user?");
+			console.error("More than one user");
 			return callback(null);
 		}
 	});

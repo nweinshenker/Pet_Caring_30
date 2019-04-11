@@ -23,9 +23,11 @@ function initRouter(app) {
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/getpet', passport.authMiddleware(), getpet);
 	app.get('/owner', passport.authMiddleware(), ownerprofile);
+	// app.get('/givereview', passport.authMiddleware(), givereview);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
+	app.get('/caretaker', passport.authMiddleware(), caretakerprofile);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
@@ -146,7 +148,7 @@ function postservice(req,res,next){
 			else
 			{
 				console.log(result);
-				res.redirect('/');
+				res.redirect('/caretaker');
 				return;
 			}
 		});
@@ -208,7 +210,8 @@ function postlist(req, res, next) {
 			}
 			else {
 				console.log(result);
-				res.redirect('/');
+				res.redirect('/caretaker');
+				return;
 			}
 		});
 	}
@@ -221,12 +224,12 @@ function ownerprofile(req, res, next) {
 	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
 	{	
 		console.log('not a owner yet');
-		res.redirect('/');
+		res.redirect('/becomeOwner');
 		return;
 	}
 	else
 	{
-		search_pet = "BEGIN;";
+		var search_pet = "BEGIN;";
 		search_pet += "Select * from petowned P natural join cat C where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
 		search_pet += "END;"
@@ -244,12 +247,48 @@ function ownerprofile(req, res, next) {
 				var cats = result[1].rows;
 				console.log(dogs)
 				console.log(cats);
-				console.log(cats[0].petnum);
+				// console.log(cats[0].petnum);
 				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
 			}
 		});
 	}
 }
+
+
+
+function caretakerprofile(req,res,next){
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		console.log('not a caretaker yet');
+		res.redirect('/becomeCaretaker');
+		return;
+	}
+	else
+	{
+		var search_list = "BEGIN; Select * from list L natural join services S where L.caretakerId = '"+req.user.username+"';";
+		search_list += "Select * from provides P natural join services S where P.caretakerId ='"+req.user.username+"';";
+		search_list += "END;";
+		console.log("search_pet::::::::::::::::::"+search_list);
+		pool.query(search_list , function (err, result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				var l = result[1].rows;
+				var s = result[2].rows;
+				console.log(search_list+":::::::"+l+"::::::"+s);
+				// console.log(result[1]);
+				res.render('caretakerprofile', { page: 'caretakerprofile' , title: 'Caretaker', lists : l, skills : s});
+			}
+		});
+	}
+
+}
+
 
 function getpet(req, res, next) {
 	// console.log("inside get pettttt" + req.session.status);
@@ -295,10 +334,15 @@ function postpet(req, res, next) {
 	console.log(sql_query);
 	  pool.query(sql_query,function(err,result){
 		if(err)
+		{
 			console.log(err);
+			res.redirect('/');
+			return;
+		}
 		else {
 			console.log(result);
-			res.redirect('/');
+			res.redirect('/owner');
+			return;
 		}
 	});
 	}
@@ -325,7 +369,7 @@ function becomeOwner(req, res, next) {
 		}
 		else {
 			console.log(result);
-			res.redirect('/');
+			res.redirect('/setsession');
 		}
 	});
 	// res.redirect('/login');
@@ -340,10 +384,11 @@ function becomeCaretaker(req, res, next) {
 		if (err) {
 			console.log(err);
 			res.redirect('/');
+			return;
 		}
 		else {
 			console.log(result);
-			res.redirect('/');
+			res.redirect('/setsession');
 		}
 	});
 	// res.redirect('/login');
