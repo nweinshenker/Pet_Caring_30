@@ -463,10 +463,10 @@ function getcare(req, res, next) {
 		return;
 	}
 	var tbl = [];
-	var query = 'SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C)';
+	var query = 'SELECT L.caretakerid, C.review, L.baseprice, L.listId from (list L natural join cares C)';
 	console.log(query);
 	pool.query(query, (err, data) => {
-		console.log(data)
+		console.log(data);
 		// tbl = data;
 		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
@@ -474,6 +474,7 @@ function getcare(req, res, next) {
 		} else {
 			tbl = data.rows;
 		}
+		console.log('rendering');
 		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl});
 	});
 }
@@ -482,9 +483,10 @@ function findcare (req, res, next) {
 	// console.log(req.body);
 	var date2 = req.body.day;
 	console.log(date2);
+	console.log(req.body);
 	var tbl = [];
 	var base;
-	var query = `SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
+	var query = `SELECT L.caretakerid, C.review, L.baseprice, L.listId from (list L natural join cares C) where C.selected_date = to_date('${date2}','MM DD YYYY');`;
 
 	console.log(query);
 
@@ -518,15 +520,18 @@ function logout(req, res, next) {
 }
 
 function getbid(req,res){
+	console.log('its running');
 	if (req.session.status === 'caretaker' || req.session.status === 'none')
 	{
+		console.log('err');
 		res.redirect('/');
 	}
 	else
 	{
 		res.render('bid',{
 			page : 'bid',
-			title: 'Bidding'
+			title: 'Bidding',
+			listid: req.query.listid
 		});
 	}
 }
@@ -539,7 +544,41 @@ function postbid(req,res){
 	else
 	{
 		console.log(req.body);
-		console
+		console.log(req.user.username);
+		petname=req.body.petname;
+		var query_petnum = `SELECT petnum from petowned where name='${petname}' and ownerId='${req.user.username}';`;
+		console.log(query_petnum);
+		pool.query(query_petnum, function (err,result) {
+			console.log('bsdkkkkk');
+			if(err){
+				console.log('err'+ err);
+			}
+			else{
+				console.log(result);
+				if(result.rows.length > 0) {
+					var insert_query = `INSERT INTO bid VALUES('${req.user.username}','${req.body.listid}','${req.body.price}','${result.rows[0].petnum}')`;
+					pool.query(insert_query, function (err, result) {
+						if (err)
+						{
+							console.log(err);
+							res.redirect('/getcare');
+						}
+						else {
+							if(result.rowCount === 0){
+								res.redirect('/');
+							}
+							console.log(result);
+							res.redirect('/');
+						}
+					});
+				}
+				else{
+					console.log('Invalid name');
+					res.redirect('/getcare');
+				}
+			}
+		});
+
 	}
 }
 
