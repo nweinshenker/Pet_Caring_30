@@ -32,15 +32,16 @@
            
             <div class="form-group">
                 <label for="day">Day</label>
-                <input class="form-control" type ="text" id="day" name="day" placeholder="Enter the day">
+                <input class="form-control" type ="text" id="day" name="day" placeholder="Enter the day" required>
             </div>
             <div class="form-group">
                 <label for="price">Min. Price</label>
-                <input type="number" step="1" class="form-control" name="price" id="price" placeholder="Enter your Base Price">
+                <input type="number" step="1" class="form-control" name="price" id="price" placeholder="Enter your Base Price" required>
             </div>
             <div class="form-group">
+                 <label for="servicertype">Type of Service</label>
             <select class="browser-default custom-select" id="service" name="service" required>
-            <option value="">Please Select Cat or Dog</option>
+            <option value="">Please Select a Service</option>
             <% for( var i in services ) {%>
                 <option value="<%= services[i].serviceid %>" > <%= services[i].name %></option>
             <% } %>

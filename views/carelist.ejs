@@ -61,6 +61,7 @@
                     <thead>
                         <tr>
                             <th>CareTake Id</th>
+                            <th>Available Dates</th>
                             <th>Price</th>
                             <th>Review</th>
                         </tr>
@@ -71,6 +72,7 @@
                         <% for(var i=0; i<tbl.length; i++) { %>
                         <tr>
                             <td><a href='/getbid?listid=<%=tbl[i].listid%>'> <%= tbl[i].caretakerid%></a></td>
+                            <td><%= tbl[i].selected_date%></td>
                             <td><%= tbl[i].baseprice%></td>
                             <td><%= tbl[i].review%></td>
                         </tr>

@@ -23,14 +23,20 @@ function initRouter(app) {
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/getpet', passport.authMiddleware(), getpet);
 	app.get('/owner', passport.authMiddleware(), ownerprofile);
+	app.get('/givereview', passport.authMiddleware(), givereview);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
+	app.get('/caretaker', passport.authMiddleware(), caretakerprofile);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
+
+	/* Nathan's function's lol */
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.post('/findcare', passport.authMiddleware(), findcare);
+	app.get('/deletepet', passport.authMiddleware(), renderdelete);
+	app.post('/postdelete', passport.authMiddleware, postdelete);
 	
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
@@ -146,7 +152,7 @@ function postservice(req,res,next){
 			else
 			{
 				console.log(result);
-				res.redirect('/');
+				res.redirect('/caretaker');
 				return;
 			}
 		});
@@ -208,7 +214,8 @@ function postlist(req, res, next) {
 			}
 			else {
 				console.log(result);
-				res.redirect('/');
+				res.redirect('/caretaker');
+				return;
 			}
 		});
 	}
@@ -221,12 +228,12 @@ function ownerprofile(req, res, next) {
 	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
 	{	
 		console.log('not a owner yet');
-		res.redirect('/');
+		res.redirect('/becomeOwner');
 		return;
 	}
 	else
 	{
-		search_pet = "BEGIN;";
+		var search_pet = "BEGIN;";
 		search_pet += "Select * from petowned P natural join cat C where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
 		search_pet += "END;"
@@ -244,12 +251,48 @@ function ownerprofile(req, res, next) {
 				var cats = result[1].rows;
 				console.log(dogs)
 				console.log(cats);
-				console.log(cats[0].petnum);
+				// console.log(cats[0].petnum);
 				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
 			}
 		});
 	}
 }
+
+
+
+function caretakerprofile(req,res,next){
+	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	{	
+		console.log('not a caretaker yet');
+		res.redirect('/becomeCaretaker');
+		return;
+	}
+	else
+	{
+		var search_list = "BEGIN; Select * from list L natural join services S where L.caretakerId = '"+req.user.username+"';";
+		search_list += "Select * from provides P natural join services S where P.caretakerId ='"+req.user.username+"';";
+		search_list += "END;";
+		console.log("search_pet::::::::::::::::::"+search_list);
+		pool.query(search_list , function (err, result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				var l = result[1].rows;
+				var s = result[2].rows;
+				console.log(search_list+":::::::"+l+"::::::"+s);
+				// console.log(result[1]);
+				res.render('caretakerprofile', { page: 'caretakerprofile' , title: 'Caretaker', lists : l, skills : s});
+			}
+		});
+	}
+
+}
+
 
 function getpet(req, res, next) {
 	// console.log("inside get pettttt" + req.session.status);
@@ -295,10 +338,15 @@ function postpet(req, res, next) {
 	console.log(sql_query);
 	  pool.query(sql_query,function(err,result){
 		if(err)
+		{
 			console.log(err);
+			res.redirect('/');
+			return;
+		}
 		else {
 			console.log(result);
-			res.redirect('/');
+			res.redirect('/owner');
+			return;
 		}
 	});
 	}
@@ -325,7 +373,7 @@ function becomeOwner(req, res, next) {
 		}
 		else {
 			console.log(result);
-			res.redirect('/');
+			res.redirect('/setsession');
 		}
 	});
 	// res.redirect('/login');
@@ -340,10 +388,11 @@ function becomeCaretaker(req, res, next) {
 		if (err) {
 			console.log(err);
 			res.redirect('/');
+			return;
 		}
 		else {
 			console.log(result);
-			res.redirect('/');
+			res.redirect('/setsession');
 		}
 	});
 	// res.redirect('/login');
@@ -463,7 +512,7 @@ function getcare(req, res, next) {
 		return;
 	}
 	var tbl = [];
-	var query = 'SELECT L.caretakerid, C.review, L.baseprice, L.listId from (list L natural join cares C)';
+	var query = 'SELECT L.caretakerid, C.review, L.baseprice, C.selected_date, L.listId from (list L natural join cares C)';
 	console.log(query);
 	pool.query(query, (err, data) => {
 		console.log(data);
@@ -486,7 +535,7 @@ function findcare (req, res, next) {
 	console.log(req.body);
 	var tbl = [];
 	var base;
-	var query = `SELECT L.caretakerid, C.review, L.baseprice, L.listId from (list L natural join cares C) where C.selected_date = to_date('${date2}','MM DD YYYY');`;
+	var query = `SELECT L.caretakerid, C.review,  C.selected_date, L.baseprice, L.listId from (list L natural join cares C) where C.selected_date = to_date('${date2}','MM DD YYYY');`;
 
 	console.log(query);
 
@@ -505,7 +554,38 @@ function findcare (req, res, next) {
 	// console.log(dateValue);
 
 	// var list_query = "SELECT caretakerId, serviceId, selectedDate FROM CARES where selectedDate" = 'dateValue';
+}
 
+/** CARETAKER FUNCTIONALITY
+ * 1. DELETE PETS
+ **/
+
+function renderdelete(req, res, next) {
+	// console.log("inside get pettttt" + req.session.status);
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
+		res.redirect('/');
+	}
+	else
+		res.render('deletepet', { page: 'deletepet', title: 'Delete Pet' });
+}
+
+function postdelete(req, res, next) {
+	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+		res.redirect('/');
+		return;
+	}
+	var pet_num = req.petnum;
+	var delete_pet = "Delete * from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
+	console.log(delete_pet);
+	pool.query(delete_pet, (err, data) => {
+		if (err)
+			console.log(err);
+		else {
+			console.log(data);
+			res.redirect('/owner');
+		}
+		
+	});
 }
 
 
@@ -579,6 +659,35 @@ function postbid(req,res){
 			}
 		});
 
+	}
+}
+
+function givereview(req,res,next){
+	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		var update_cares = 
+		console.log("search_pet::::::::::::::::::"+search_pet);
+		pool.query(search_pet , function (err, result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				var dogs = result[2].rows;
+				var cats = result[1].rows;
+				console.log(dogs)
+				console.log(cats);
+				// console.log(cats[0].petnum);
+				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
+			}
+		});
 	}
 }
 
