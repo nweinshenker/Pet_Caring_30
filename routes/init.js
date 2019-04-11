@@ -463,9 +463,10 @@ function getcare(req, res, next) {
 		return;
 	}
 	var tbl = [];
-	var query = 'SELECT * FROM caretaker';
+	var query = 'SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C)';
+	console.log(query);
 	pool.query(query, (err, data) => {
-		// console.log(data)
+		console.log(data)
 		// tbl = data;
 		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
@@ -483,7 +484,7 @@ function findcare (req, res, next) {
 	console.log(date2);
 	var tbl = [];
 	var base;
-	var query = `SELECT C.caretakerid, C1.experience from (cares C natural join caretaker C1) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
+	var query = `SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
 
 	console.log(query);
 
