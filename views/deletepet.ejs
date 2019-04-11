@@ -28,13 +28,16 @@
 <body>
     <h1><%= title%></h1>
 
-    <form id="html_form" action="/postdelete" role="form" method="post">
-        <div class="form-group">
-            <label for="pname">Delete Pet </label>
-            <input class="form-control" type="text" id="petnum" name="pname" placeholder="Enter the pet number">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+     <form id="html_form" action="postdelete" role="form" method="post">
+            <div class="form-group">
+                <label for="petnum">Pet Num</label>
+                <input class="form-control" type ="text" id="petnum" name="petnum" placeholder="Enter the pet number" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+
+
+
+        </form>
 
 </body>
 

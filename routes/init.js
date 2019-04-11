@@ -39,7 +39,7 @@ function initRouter(app) {
 	app.get('/getbid', passport.authMiddleware(), getbid);
 	app.post('/postbid', passport.authMiddleware(), postbid);
 	app.get('/deletepet', passport.authMiddleware(), renderdelete);
-	app.post('/postdelete', passport.authMiddleware, postdelete);
+	app.post('/postdelete', passport.authMiddleware(), postdelete);
 
 	app.post('/postlist', passport.authMiddleware(), postlist);
 	app.post('/postpet', passport.authMiddleware(), postpet);
@@ -544,9 +544,9 @@ function postdelete(req, res) {
 		res.redirect('/');
 		return;
 	}
-	var pet_num = req.petnum;
+	var pet_num = req.body.petnum;
 	console.log(pet_num);
-	var delete_pet = "Delete * from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
+	var delete_pet = "Delete from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
 	console.log(delete_pet);
 	pool.query(delete_pet, (err, data) => {
 		if (err) {
