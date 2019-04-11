@@ -37,6 +37,16 @@
     	<li><%= dogs[i].name %></li>
     	<% } %>
     </ol>
+    <br>
+    <br>
+       <% } %>
+    <% if (dogs.length > 0) { %>
+    <h3>History</h3>
+    <ol>
+        <% for( var i in pasts ) {%>
+        <li><a href='/getreview?listid=<%= pasts[i].lid%>'><%= pasts[i].uname %>--------<%= pasts[i].sname %></a></li>
+        <% } %>
+    </ol>
     <% } %>
     <a href="getpet">ADD PET</a><br>
     <a href="getcare">Search for Caretakers</a>

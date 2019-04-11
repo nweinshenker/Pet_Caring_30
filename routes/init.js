@@ -17,13 +17,14 @@ function initRouter(app) {
 	app.get('/register', passport.antiMiddleware(), register);
 	app.get('/login', passport.antiMiddleware(), getlogin);
 	app.get('/setsession', passport.authMiddleware(), setsession);
-	
+	app.get('/testing',passport.authMiddleware(),testing);
 
 
 	app.get('/becomeOwner', passport.authMiddleware(), becomeOwner);
 	app.get('/getpet', passport.authMiddleware(), getpet);
 	app.get('/owner', passport.authMiddleware(), ownerprofile);
-	app.get('/givereview', passport.authMiddleware(), givereview);
+	app.get('/getreview', passport.authMiddleware(), getreview);
+	app.post('/postreview', passport.authMiddleware(), postreview);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	// app.get('/findsitter',passport.authMiddleware(), getsitter);
 	/* List all CareTakers in a Table */
@@ -229,9 +230,16 @@ function ownerprofile(req, res, next) {
 	}
 	else
 	{
+		var curr = new Date();
 		var search_pet = "BEGIN;";
+		var currdate = new Date();
+		var todate=new Date(currdate).getDate();
+		var tomonth=new Date(currdate).getMonth()+1;
+		var toyear=new Date(currdate).getFullYear();
+		var original_date=tomonth+'/'+todate+'/'+toyear;
 		search_pet += "Select * from petowned P natural join cat C where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
+		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
 		search_pet += "END;"
 		console.log("search_pet::::::::::::::::::"+search_pet);
 		pool.query(search_pet , function (err, result){
@@ -245,10 +253,12 @@ function ownerprofile(req, res, next) {
 			{
 				var dogs = result[2].rows;
 				var cats = result[1].rows;
-				console.log(dogs)
+				var past = result[3].rows;
+				console.log(dogs);
+				console.log(past);
 				console.log(cats);
 				// console.log(cats[0].petnum);
-				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
+				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows , pasts: past});
 			}
 		});
 	}
@@ -279,8 +289,18 @@ function caretakerprofile(req,res,next){
 			else
 			{
 				var l = result[1].rows;
-				var s = result[2].rows;
-				console.log(search_list+":::::::"+l+"::::::"+s);
+				console.log(l);
+				// var date=result[1].rows[0].available_dates;
+				// var todate=new Date(date).getDate();
+			 //    var tomonth=new Date(date).getMonth()+1;
+			 //    var toyear=new Date(date).getFullYear();
+			 //    var original_date=tomonth+'/'+todate+'/'+toyear;
+				// console.log(date.toDateString());
+				// console.log(original_date);
+				// to_date('$(original_date)','MM DD YYYY')
+				// console.log(result[1].rows);
+				// var s = result[2].rows;
+				// console.log(search_list+":::::::"+l+"::::::"+s);
 				// console.log(result[1]);
 				res.render('caretakerprofile', { page: 'caretakerprofile' , title: 'Caretaker', lists : l, skills : s});
 			}
@@ -588,16 +608,38 @@ function postbid(req,res){
 	}
 }
 
-function givereview(req,res,next){
+function getreview(req,res,next){
 	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
 		res.redirect('/');
 		return;
 	}
 	else
 	{
-		var update_cares = 
-		console.log("search_pet::::::::::::::::::"+search_pet);
-		pool.query(search_pet , function (err, result){
+		// req.flash('listid', req.params.listid);
+		console.log(req.query);
+		res.render('getreview',{
+			page : 'getreview',
+			title: 'Add Review',
+			listid: req.query.listid
+		});
+	}
+}
+
+function postreview(req,res,next){
+	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+		res.redirect('/');
+		return;
+	}
+	else
+	{
+		console.log(req.body.content);
+		console.log(req.body.listid);
+		// var lid = req.flash('listid');
+		var lid = req.body.listid;
+		// console.log(req.flash('listid')); ///find a way to send it from front end
+		var update_cares = "Update cares set review = '"+req.body.content+"' where listId = '"+lid+"'";
+		console.log("update_cares::::::::::::::::::"+update_cares);
+		pool.query(update_cares , function (err, result){
 			if(err)
 			{
 				console.log(err);
@@ -606,17 +648,42 @@ function givereview(req,res,next){
 			}
 			else
 			{
-				var dogs = result[2].rows;
-				var cats = result[1].rows;
-				console.log(dogs)
-				console.log(cats);
+				
 				// console.log(cats[0].petnum);
-				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
+				console.log(result);
+				res.redirect('/owner'); //change to where list of ct's 
+				return;
 			}
 		});
 	}
 }
 
+
+function testing(req,res,next){
+	var num  = 3;
+	var content = "something";
+	var d = new Date();
+	console.log(d);
+	var search_list = "Select convert(varchar(10),available_dates,103) from list L natural join services S where L.caretakerId = '"+req.user.username+"'";
+	var update_cares = "Update cares set review = '"+content+"' where listId = '"+num+"'";
+	pool.query(search_list , function (err, result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+				return;
+			}
+			else
+			{
+				var d = new Date();
+				console.log(d)
+				// console.log(cats[0].petnum);
+				console.log(result.rows);
+				res.redirect('/');
+				return;
+			}
+		});
+}
 module.exports = initRouter;
 
 
