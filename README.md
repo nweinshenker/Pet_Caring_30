@@ -1,90 +1,52 @@
-# Project Title
+# Pet Caring
 
+Pet Caring is our version of dog sitting application that pairs owners with respective caretakers. The 
+application was built for CS2102 to show the practical usage of a DBMS in a real world setting.
 
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
 Required software to deploy the application through `localhost:3000`
 
+Install Node.js -- download through node.js website
+Install Express.js `npm install express`
 
-
-```
-Give examples
-```
 
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
 
-Say what the step will be
+Install the dependencies and devDependencies and start the server.
 
+Clone the repository with 
 ```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+git clone <path_to_repo> && cd repo
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Run through terminal `npm start` to run the server
+Go to `localhost:3000` to see the web application.
 
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
+Sample output after running `npm start`
+`>pet-caring-30@0.0.0 start /Users/nathanweinshenker/Documents/NUS18-19/Pet_Caring_30 >`
+`node ./bin/www`
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+* [Node.js](https://nodejs.org/) -  an open-source, cross-platform JavaScript run-time environment
+* [Express](https://maven.apache.org/) - web application framework for Node.js,
+* [Bootstrap](https://getbootstrap.com/) - an open source, css library
+* [SQL]
+* [HTML]
+* [CSS]
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Tarush Agurwal** 
+* **Divyanesh**
+* **Caroline Busse**
+* **Nathan Weinshenker**
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
 
