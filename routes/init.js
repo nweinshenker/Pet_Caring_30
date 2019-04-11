@@ -29,8 +29,12 @@ function initRouter(app) {
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
+
+	/* Nathan's function's lol */
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.post('/findcare', passport.authMiddleware(), findcare);
+	app.get('/deletepet', passport.authMiddleware(), renderdelete);
+	app.post('/postdelete', passport.authMiddleware, postdelete);
 	
 	/* PROTECTED POST */
 	// app.post('/update_info', passport.authMiddleware(), update_info);
@@ -244,7 +248,7 @@ function ownerprofile(req, res, next) {
 				var cats = result[1].rows;
 				console.log(dogs)
 				console.log(cats);
-				console.log(cats[0].petnum);
+				// console.log(cats[0].petnum);
 				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows });
 			}
 		});
@@ -463,7 +467,7 @@ function getcare(req, res, next) {
 		return;
 	}
 	var tbl = [];
-	var query = 'SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C)';
+	var query = 'SELECT L.caretakerid, C.review, C.selected_date,  L.baseprice from (list L natural join cares C);';
 	console.log(query);
 	pool.query(query, (err, data) => {
 		console.log(data)
@@ -484,7 +488,7 @@ function findcare (req, res, next) {
 	console.log(date2);
 	var tbl = [];
 	var base;
-	var query = `SELECT L.caretakerid, C.review, L.baseprice from (list L natural join cares C) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
+	var query = `SELECT L.caretakerid, C.review, C.selected_date,  L.baseprice from (list L natural join cares C) where C.selected_date = to_date('${date2}','DD MM YYYY');`;
 
 	console.log(query);
 
@@ -503,7 +507,38 @@ function findcare (req, res, next) {
 	// console.log(dateValue);
 
 	// var list_query = "SELECT caretakerId, serviceId, selectedDate FROM CARES where selectedDate" = 'dateValue';
+}
 
+/** CARETAKER FUNCTIONALITY
+ * 1. DELETE PETS
+ **/
+
+function renderdelete(req, res, next) {
+	// console.log("inside get pettttt" + req.session.status);
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
+		res.redirect('/');
+	}
+	else
+		res.render('deletepet', { page: 'deletepet', title: 'Delete Pet' });
+}
+
+function postdelete(req, res, next) {
+	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+		res.redirect('/');
+		return;
+	}
+	var pet_num = req.petnum;
+	var delete_pet = "Delete * from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
+	console.log(delete_pet);
+	pool.query(delete_pet, (err, data) => {
+		if (err)
+			console.log(err);
+		else {
+			console.log(data);
+			res.redirect('/owner');
+		}
+		
+	});
 }
 
 
