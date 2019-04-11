@@ -35,20 +35,14 @@ function initRouter(app) {
 	/* Nathan's function's lol */
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.post('/findcare', passport.authMiddleware(), findcare);
+	app.get('/getbid', passport.authMiddleware(), getbid);
+	app.post('/postbid', passport.authMiddleware(), postbid);
 	app.get('/deletepet', passport.authMiddleware(), renderdelete);
 	app.post('/postdelete', passport.authMiddleware, postdelete);
-	
-	/* PROTECTED POST */
-	// app.post('/update_info', passport.authMiddleware(), update_info);
-	// app.post('/update_pass', passport.authMiddleware(), update_pass);
-	// app.post('/add_game'   , passport.authMiddleware(), add_game   );
-	// app.post('/add_play'   , passport.authMiddleware(), add_play   );
-
 
 	app.post('/postlist', passport.authMiddleware(), postlist);
 	app.post('/postpet', passport.authMiddleware(), postpet);
 	app.post('/ct/postservice', passport.authMiddleware(), postservice);
-
 
 	/* LOGIN */
 	app.post('/login', passport.authenticate('local', {
@@ -58,48 +52,22 @@ function initRouter(app) {
 	app.post('/reg_user', passport.antiMiddleware(), reg_user);
 	/* LOGOUT */
 	app.get('/logout', passport.authMiddleware(), logout);
-	app.get('/getbid', passport.authMiddleware(), getbid);
-	app.post('/postbid', passport.authMiddleware(), postbid);
 }
 
 
 ////res.session.status variable defined 
 //// value : none / caretaker / owmner / both
 
-///Still not used
-function basic(req, res, page, other) {
-	var info = {
-		page: page,
-		user: req.user.username,
-		firstname: req.user.name,
-		// lastname : req.user.lastname,
-		// status   : req.user.status,
-	};
-	if (other) {
-		for (var fld in other) {
-			info[fld] = other[fld];
-		}
-	}
-	res.render(page, info);
-}
-
-
-
-
-
-
 ///home
-function index(req, res, next) {
+function index(req, res) {
 	console.log(req.session.status);
 	res.render('index', { title: 'Express' });
 }
 
-
-function addservice(req,res,next){
+function addservice(req,res){
 	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 	{
@@ -109,7 +77,6 @@ function addservice(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -120,17 +87,16 @@ function addservice(req,res,next){
 }
 
 
-function postservice(req,res,next){
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+function postservice(req,res){
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
-		return;
 	}
 	else
 	{
 		console.log(req.body);
 		var len = req.body.length;
-		add_provides ="BEGIN;";
+		var add_provides ="BEGIN;";
 		for( var i =0; i<len;i++)
 		{
 			// var ch = toString(i);
@@ -147,13 +113,11 @@ function postservice(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
 				console.log(result);
 				res.redirect('/caretaker');
-				return;
 			}
 		});
 
@@ -161,9 +125,9 @@ function postservice(req,res,next){
 }
 
 /////Adding availability in table list
-function getlist(req,res,next){
+function getlist(req,res){
 	// console.log(req.session.status);
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		res.redirect('/');
 	}
@@ -177,7 +141,6 @@ function getlist(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -192,7 +155,7 @@ function getlist(req,res,next){
 
 }
 
-function postlist(req, res, next) {
+function postlist(req, res) {
 	// console.log('hahahahaha');
 	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
@@ -210,12 +173,10 @@ function postlist(req, res, next) {
 			if (err){
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else {
 				console.log(result);
 				res.redirect('/caretaker');
-				return;
 			}
 		});
 	}
@@ -223,13 +184,12 @@ function postlist(req, res, next) {
 }
 
 
-function ownerprofile(req, res, next) {
+function ownerprofile(req, res) {
 	// console.log("inside get pettttt" + req.session.status);
-	if (!(req.session.status == 'owner' || req.session.status == 'both' ))
+	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
 		console.log('not a owner yet');
 		res.redirect('/becomeOwner');
-		return;
 	}
 	else
 	{
@@ -243,7 +203,6 @@ function ownerprofile(req, res, next) {
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -260,12 +219,11 @@ function ownerprofile(req, res, next) {
 
 
 
-function caretakerprofile(req,res,next){
-	if (!(req.session.status == 'caretaker' || req.session.status == 'both' ))
+function caretakerprofile(req,res){
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
 	{	
 		console.log('not a caretaker yet');
 		res.redirect('/becomeCaretaker');
-		return;
 	}
 	else
 	{
@@ -278,7 +236,6 @@ function caretakerprofile(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
@@ -294,7 +251,7 @@ function caretakerprofile(req,res,next){
 }
 
 
-function getpet(req, res, next) {
+function getpet(req, res) {
 	// console.log("inside get pettttt" + req.session.status);
 	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
@@ -304,7 +261,7 @@ function getpet(req, res, next) {
 		res.render('addpet', { page: 'addpet', title: 'Add Pet' });
 }
 
-function postpet(req, res, next) {
+function postpet(req, res) {
 	
 	if (!(req.session.status === 'owner' || req.session.status === 'both' ))
 	{	
@@ -341,12 +298,10 @@ function postpet(req, res, next) {
 		{
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
 			console.log(result);
 			res.redirect('/owner');
-			return;
 		}
 	});
 	}
@@ -355,7 +310,7 @@ function postpet(req, res, next) {
 
 
 //Adding to caretaker or owner table
-function becomeOwner(req, res, next) {
+function becomeOwner(req, res) {
 
 
 	// if(res.session == )
@@ -369,7 +324,6 @@ function becomeOwner(req, res, next) {
 		{ 
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
 			console.log(result);
@@ -379,7 +333,7 @@ function becomeOwner(req, res, next) {
 	// res.redirect('/login');
 }
 
-function becomeCaretaker(req, res, next) {
+function becomeCaretaker(req, res) {
 	var insert_query = `INSERT INTO caretaker VALUES('${req.user.username}')`;
 	// console.log(req.user);
 	console.log(req.user.username);
@@ -388,7 +342,6 @@ function becomeCaretaker(req, res, next) {
 		if (err) {
 			console.log(err);
 			res.redirect('/');
-			return;
 		}
 		else {
 			console.log(result);
@@ -400,7 +353,7 @@ function becomeCaretaker(req, res, next) {
 
 
 //Adding User
-function register(req, res, next) {
+function register(req, res) {
 	res.render('register', {
 		page: 'register', auth: false, title: 'Owner Sign Up',
 		messages: {
@@ -411,12 +364,11 @@ function register(req, res, next) {
 	console.log(req.flash('warning'));
 }
 
-function reg_user(req, res, next) {
+function reg_user(req, res) {
 	// console.log(auth);
 	var sql_query = 'INSERT INTO users VALUES';
 	var id = req.body.emailid;
 	var name = req.body.Name;
-	var password = req.body.password;
 	var check_query = `SELECT userid FROM users WHERE userid='${id}'`;
 	console.log(check_query);
 	var pwd = bcrypt.hashSync(req.body.password, salt);
@@ -454,9 +406,7 @@ function reg_user(req, res, next) {
 }
 
 
-
-
-function getlogin(req, res, next) {
+function getlogin(req, res) {
 	res.render('login', {
 		page: 'login', auth: false, title: 'Login',
 		messages: {
@@ -467,7 +417,7 @@ function getlogin(req, res, next) {
 }
 
 
-function setsession(req,res,next){
+function setsession(req,res){
 	console.log(req.user);
 	ssn=req.session;
 	var stat = 'none';
@@ -506,8 +456,8 @@ function setsession(req,res,next){
  * 3. POST A BID FOR A CARETAKER
  **/
 
-function getcare(req, res, next) {
-	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+function getcare(req, res) {
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
 		return;
 	}
@@ -528,7 +478,7 @@ function getcare(req, res, next) {
 	});
 }
 
-function findcare (req, res, next) {
+function findcare (req, res) {
 	// console.log(req.body);
 	var date2 = req.body.day;
 	console.log(date2);
@@ -541,7 +491,7 @@ function findcare (req, res, next) {
 
 	pool.query(query, (err, data) => {
 		console.log(data);
-		if (err || !data.rows || data.rows.length == 0) {
+		if (err || !data.rows || data.rows.length === 0) {
 			tbl = [];
 			base = false;
 		} else {
@@ -560,7 +510,7 @@ function findcare (req, res, next) {
  * 1. DELETE PETS
  **/
 
-function renderdelete(req, res, next) {
+function renderdelete(req, res) {
 	// console.log("inside get pettttt" + req.session.status);
 	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
@@ -569,8 +519,8 @@ function renderdelete(req, res, next) {
 		res.render('deletepet', { page: 'deletepet', title: 'Delete Pet' });
 }
 
-function postdelete(req, res, next) {
-	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+function postdelete(req, res) {
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
 		return;
 	}
@@ -584,16 +534,12 @@ function postdelete(req, res, next) {
 			console.log(data);
 			res.redirect('/owner');
 		}
-		
 	});
 }
 
 
 
-
-
-
-function logout(req, res, next) {
+function logout(req, res) {
 	req.session.destroy();
 	req.logout();
 	res.redirect('/');
@@ -662,10 +608,9 @@ function postbid(req,res){
 	}
 }
 
-function givereview(req,res,next){
-	if (!(req.session.status == 'owner' || req.session.status == 'both')) {
+function givereview(req,res){
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
-		return;
 	}
 	else
 	{
@@ -676,7 +621,6 @@ function givereview(req,res,next){
 			{
 				console.log(err);
 				res.redirect('/');
-				return;
 			}
 			else
 			{
