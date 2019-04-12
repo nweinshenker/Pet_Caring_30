@@ -40,12 +40,13 @@
             </div>
             <div class="form-group">
                  <label for="servicertype">Type of Service</label>
-            <select class="browser-default custom-select" id="service" name="service" required>
+            <select class="browser-default custom-select" id="servicertype" name="service" required>
             <option value="">Please Select a Service</option>
             <% for( var i in services ) {%>
                 <option value="<%= services[i].serviceid %>" > <%= services[i].name %></option>
             <% } %>
             </select>
+            </div>
             <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>

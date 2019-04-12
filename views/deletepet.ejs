@@ -28,16 +28,23 @@
 <body>
     <h1><%= title%></h1>
 
-     <form id="html_form" action="postdelete" role="form" method="post">
-            <div class="form-group">
-                <label for="petnum">Pet Num</label>
-                <input class="form-control" type ="text" id="petnum" name="petnum" placeholder="Enter the pet number" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+    <form id="html_form" action="postdelete" role="form" method="post">
+        <div class="form-group">
+            <label for="servicertype">List of Pets</label>
+            <select class="browser-default custom-select" id="petnum" name="petnum" required>
+                <option value="">Please Select a Pet</option>
+                <% for( var i in dogs) {%>
+                <option value="<%= dogs[i].petnum %>"> <%= dogs[i].name %></option>
+                <% } %>
+                <% for( var i in cats) {%>
+                <option value="<%= cats[i].petnum %>"> <%= cats[i].name%></option>
+                <% } %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form> 
 
 
-
-        </form>
 
 </body>
 

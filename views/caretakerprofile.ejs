@@ -9,9 +9,20 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 		
 		<!-- JavaScript for Interactivity -->
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+              integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+              crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+              integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+              crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+              integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+              crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+      <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
 
 		<!-- ADDED JavaScript -->
 		<!-- <script src="javascripts/signupScript.js"></script> -->
@@ -22,19 +33,49 @@
     <h1><%= title%></h1>
     <% if (lists.length > 0) { %>
     <h3>Your Advertised Availabilities</h3>
-    <h6>  Service Name                  Base Price                  Day</h6>
-    <ol>
-    	<% for( var i in lists ) {%>
-        <% var date = lists[i].available_dates;
-        var todate=new Date(date).getDate();
-        var tomonth=new Date(date).getMonth()+1;
-        var toyear=new Date(date).getFullYear();
-        var original_date=tomonth+'/'+todate+'/'+toyear; %>
-    	<li>     <%= lists[i].name %>                  <%= lists[i].baseprice%>                  <%= original_date%></li>
-    	<% } %>
-    </ol>
-    <br>
-    <br>
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Base Price</th>
+                    <th>Date</th>
+                    <th>Update Availability</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for( var i in lists ) {%>
+                    <% var date = lists[i].available_dates;
+                        var todate=new Date(date).getDate();
+                        var tomonth=new Date(date).getMonth()+1;
+                        var toyear=new Date(date).getFullYear();
+                        var original_date=tomonth+'/'+todate+'/'+toyear; %>
+                    <tr>
+                        <td>
+                            <select class="browser-default custom-select" id="service" name="service" required>
+                                <% for( var j in skills ) {%>
+                                    <option value="<%= skills[j].name %>" <%if(lists[i].name==skills[j].name){%> selected="selected" <%}%>><%= skills[j].name %></option>
+                                <% } %>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" required value="<%=lists[i].baseprice%>">
+                        </td>
+                        <td>
+                            <input class="datepicker" value="<%= original_date %>" width="276" />
+                        </td>
+                        <td><a href="/updatelist?listid=<%=lists[i].listid%>"><button type="submit" class="btn btn-primary bg-dark">Update</button></a></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+    <script>
+        $('.datepicker').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+    </script>
+
+    <br/>
        <% } %>
     <% if (skills.length > 0) { %>
     <h3>Your Skills</h3>
