@@ -34,6 +34,11 @@
 
     <h1><%= title%></h1>
 
+    <% if ("error" in xxx) { %>
+        <p><%= xxx.error[0]%></p>
+
+    <% } %>
+
     <div class="wrapper">
 
     <form id="html_form" role="form" method="post" action="findcare">

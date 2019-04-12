@@ -400,7 +400,7 @@ function becomeCaretaker(req, res) {
 //Adding User
 function register(req, res) {
 	res.render('register', {
-		page: 'register', auth: false, title: 'Owner Sign Up',
+		page: 'register', auth: false, title: 'Owner Sign Up', error: req.flash('error'),
 		messages: {
 			danger: req.flash('danger'),
 			warning: req.flash('warning'), success: req.flash('success')
@@ -430,6 +430,8 @@ function reg_user(req, res) {
 			pool.query(insert_query, function (err, result) {
 				if (err) { 
 					console.log(err); 
+					req.flash(err, 'User was not created.');
+					res.redirect('/register');
 				}
 				else {
 					// client.query('COMMIT')
@@ -522,9 +524,6 @@ function getcare(req, res) {
 	console.log(query);
 	pool.query(query, (err, data) => {
 		console.log(data);
-		// console.log()
-		// tbl = data;
-		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
 			tbl = [];
 			fromcares=[];
@@ -535,7 +534,11 @@ function getcare(req, res) {
 		console.log(tbl);
 		// console.log(fromcares);
 		console.log('rendering');
-		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl });
+		// if ('error' in req.flash()){
+		// 	console.log(req.flash());
+		// }
+
+		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl , xxx: req.flash()});
 	});
 }
 
@@ -558,12 +561,14 @@ function findcare (req, res) {
 			tbl = [];
 			fromcares = [];
 			base = false;
+			req.flash('error', "Didn't find any correctdates");
+			res.redirect('/findcare');
 		} else {
 			tbl = data.rows;
 			// fromcares = data[2].rows;
 			base = true;
 		}
-		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl });
+		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl, error: req.flash('error')[0] });
 	});
 	
 	// console.log(dateValue);
@@ -715,7 +720,8 @@ function getreview(req,res,next){
 		res.render('getreview',{
 			page : 'getreview',
 			title: 'Add Review',
-			listid: req.query.listid
+			listid: req.query.listid,
+			error: req.flash(error)
 		});
 	}
 }
@@ -737,6 +743,7 @@ function postreview(req,res,next){
 		pool.query(update_cares , function (err, result){
 			if(err)
 			{
+				err = req.flash("warning", "didn't post review");
 				console.log(err);
 				res.redirect('/');
 			}
