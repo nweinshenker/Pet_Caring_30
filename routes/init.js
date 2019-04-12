@@ -249,6 +249,7 @@ function caretakerprofile(req,res){
 			}
 			else
 			{
+				var s = result[2].rows;
 				var l = result[1].rows;
 				console.log(l);
 				// var date=result[1].rows[0].available_dates;
@@ -260,7 +261,7 @@ function caretakerprofile(req,res){
 				// console.log(original_date);
 				// to_date('$(original_date)','MM DD YYYY')
 				// console.log(result[1].rows);
-				// var s = result[2].rows;
+				
 				// console.log(search_list+":::::::"+l+"::::::"+s);
 				// console.log(result[1]);
 				res.render('caretakerprofile', { page: 'caretakerprofile' , title: 'Caretaker', lists : l, skills : s});
