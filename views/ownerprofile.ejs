@@ -19,6 +19,8 @@
 
 
 <body>
+    <%- include navbar.ejs %>
+    <br><br><br>
     <h1><%= title%></h1>
     <% if (cats.length > 0) { %>
     <h3>your cats</h3>
@@ -40,49 +42,139 @@
     <br>
     <br>
        <% } %>
+
     <% if (futures.length > 0) { %>
-    <h3>Current bids</h3>
-    <ol>
-        <% for( var i in futures ) {%>
-        <% var date = futures[i].date;
-        var todate=new Date(date).getDate();
-        var tomonth=new Date(date).getMonth()+1;
-        var toyear=new Date(date).getFullYear();
-        var original_date=tomonth+'/'+todate+'/'+toyear; %>
-        <li><%= futures[i].uname %>--------<%= futures[i].sname %>----------<%= futures[i].price %>--------<%= original_date %></li>
-        <% } %>
-    </ol>
-    <br>
-    <br>
-       <% } %>
-       <% if (losing.length > 0) { %>
-    <h3>Losing bids</h3>
-    <ol>
-        <% for( var i in losing ) {%>
-        <% var date = losing[i].d;
-        var todate=new Date(date).getDate();
-        var tomonth=new Date(date).getMonth()+1;
-        var toyear=new Date(date).getFullYear();
-        var original_date=tomonth+'/'+todate+'/'+toyear; %>
-        <li><a href='/getbid?listid=<%= losing[i].listid%>'><%= losing[i].uname %>-----<%= losing[i].sname %>-------<%= losing[i].maxprice %>-------<%= losing[i].myprice %>-----<%= original_date %></a></li>
-        <% } %>
-    </ol>
-    <br>
-    <br>
-       <% } %>
-    <% if (pasts.length > 0) { %>
-    <h3>History</h3>
-    <ol>
-        <% for( var i in pasts ) {%>
-        <% var date = pasts[i].date;
-        var todate=new Date(date).getDate();
-        var tomonth=new Date(date).getMonth()+1;
-        var toyear=new Date(date).getFullYear();
-        var past_date=tomonth+'/'+todate+'/'+toyear; %>
-        <li><a href='/getreview?listid=<%= pasts[i].lid%>'><%= pasts[i].uname %>--------<%= pasts[i].sname %>--------<%= pasts[i].price %>--------<%= past_date %></a></li>
-        <% } %>
-    </ol>
+    <div class="card mb-3">
+        <!-- <div class="card-header">
+            <i class="fas fa-dog"></i> &nbsp;Losing Bids
+        </div> -->
+        <h3>Winning Bids</h3>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>CareTaker Name</th>
+                            <th>Service Name</th>
+                            <th>Available Dates</th>
+                            <th> Your Bid </th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                    </tfoot>
+                    <tbody>
+                        <% for( var i in futures ) {%>
+                        <% var date = futures[i].date;
+                        var todate=new Date(date).getDate();
+                        var tomonth=new Date(date).getMonth()+1;
+                        var toyear=new Date(date).getFullYear();
+                        var  original_date=tomonth+'/'+todate+'/'+toyear; %>
+                        <tr>
+                            <td><%= futures[i].uname %></td>
+                            <td><%= futures[i].sname %></td>
+                            <td><%= original_date %></td>
+                            <td><%= futures[i].price %></td>
+                        </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <% } %>
+
+
+
+    <% if (losing.length > 0) { %>
+    <div class="card mb-3">
+        <!-- <div class="card-header">
+            <i class="fas fa-dog"></i> &nbsp;Losing Bids
+        </div> -->
+        <h3>Losing bids</h3>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>CareTaker Name</th>
+                            <th>Service Name</th>
+                            <th>Available Dates</th>
+                            <th>Your Bid</th>
+                            <th>Current Bid</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                    </tfoot>
+                    <tbody>
+                        <% for( var i in losing ) {%>
+                        <% var date = losing[i].d;
+                        var todate=new Date(date).getDate();
+                        var tomonth=new Date(date).getMonth()+1;
+                        var toyear=new Date(date).getFullYear();
+                        var original_date=tomonth+'/'+todate+'/'+toyear; %>
+                        <tr>
+                            <td><%= losing[i].uname %></td>
+                            <td><%= losing[i].sname %></td>
+                            <td><%= original_date %></td>
+                            <td><%= losing[i].myprice %></td>
+                            <td><%= losing[i].maxprice %></td>
+                            <td><a href='/getbid?listid=<%= losing[i].listid %>&max=<%= losing[i].maxprice%>'> Place Bid </a></td>
+                        </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+
+
+
+    <% if (pasts.length > 0) { %>
+    <div class="card mb-3">
+        <!-- <div class="card-header">
+            <i class="fas fa-dog"></i> &nbsp;Losing Bids
+        </div> -->
+        <h3>History</h3>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>CareTaker Name</th>
+                            <th>Service Name</th>
+                            <th>Date</th>
+                            <th>Price Paid</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                    </tfoot>
+                    <tbody>
+                        <% for( var i in pasts ) {%>
+                        <% var date = pasts[i].date;
+                        var todate=new Date(date).getDate();
+                        var tomonth=new Date(date).getMonth()+1;
+                        var toyear=new Date(date).getFullYear();
+                        var past_date=tomonth+'/'+todate+'/'+toyear; %>
+                        <tr>
+                            <td><%= pasts[i].uname %></td>
+                            <td><%= pasts[i].sname %></td>
+                            <td><%= past_date %></td>
+                            <td><%= pasts[i].price %></td>
+                            <td><a href='/getreview?listid=<%= pasts[i].lid%>'> Review </a></td>
+                        </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+
     <a href="getpet">ADD PET</a><br>
     <a href="deletepet">DELETE PET</a><br>
     <a href="getcare">Search for Caretakers</a>
