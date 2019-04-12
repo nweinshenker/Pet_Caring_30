@@ -25,7 +25,12 @@
     <h6>  Service Name                  Base Price                  Day</h6>
     <ol>
     	<% for( var i in lists ) {%>
-    	<li>     <%= lists[i].name %>                  <%= lists[i].baseprice%>                  <%= lists[i].available_dates%></li>
+        <% var date = lists[i].available_dates;
+        var todate=new Date(date).getDate();
+        var tomonth=new Date(date).getMonth()+1;
+        var toyear=new Date(date).getFullYear();
+        var original_date=tomonth+'/'+todate+'/'+toyear; %>
+    	<li>     <%= lists[i].name %>                  <%= lists[i].baseprice%>                  <%= original_date%></li>
     	<% } %>
     </ol>
     <br>
