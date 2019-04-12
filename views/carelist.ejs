@@ -31,7 +31,8 @@
 </head>
 
 <body>
-
+        <%- include navbar.ejs %>
+    <br><br><br>
     <h1><%= title%></h1>
 
     <% if ("error" in xxx) { %>
@@ -52,14 +53,19 @@
                 });
             </script>
         </div>
-        <button type="hidden" id="myButton" class="btn btn-primary" >Find Available CareTakers</button>
+        <button type="hidden" id="myButton" class="btn btn-primary" >Search Based on date</button>
+
     </form>
-<br>
+    <br>
+    <a href="findcatservices"><button class="btn btn-primary">Find Cat Services</button></a>
+
+    <a href="finddogservices"><button class="btn btn-primary">Find Dog Services</button></a>
+    <br>
 
     <div class="card mb-3">
-        <div class="card-header">
+       <!--  <div class="card-header">
             <i class="fas fa-dog"></i> &nbsp; CareTaker List
-        </div>
+        </div> -->
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
