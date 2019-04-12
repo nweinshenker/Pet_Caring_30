@@ -31,8 +31,14 @@
 </head>
 
 <body>
-
+        <%- include navbar.ejs %>
+    <br><br><br>
     <h1><%= title%></h1>
+
+    <% if ("error" in xxx) { %>
+        <p><%= xxx.error[0]%></p>
+
+    <% } %>
 
     <div class="wrapper">
 
@@ -47,23 +53,29 @@
                 });
             </script>
         </div>
-        <button type="hidden" id="myButton" class="btn btn-primary" >Find Available CareTakers</button>
-    </form>
+        <button type="hidden" id="myButton" class="btn btn-primary" >Search Based on date</button>
 
+    </form>
+    <br>
+    <a href="findcatservices"><button class="btn btn-primary">Find Cat Services</button></a>
+
+    <a href="finddogservices"><button class="btn btn-primary">Find Dog Services</button></a>
+    <br>
 
     <div class="card mb-3">
-        <div class="card-header">
+       <!--  <div class="card-header">
             <i class="fas fa-dog"></i> &nbsp; CareTaker List
-        </div>
+        </div> -->
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>CareTaker Name</th>
-                            <th>Available Dates</th>
+                            <th>Available Date (MM/DD/YYYY)</th>
                             <th>Service Name</th>
-                            <th>Price</th>
+                            <th>Base Price</th>
+                            <th>Current Bid</th>
                             <th>Bid</th>
                         </tr>
                     </thead>
@@ -81,7 +93,8 @@
                             <td><%= original_date%></td>
                             <td><%= tbl[i].sname%></td>
                             <td><%= tbl[i].baseprice%></td>
-                            <td><a href='/getbid?listid=<%=tbl[i].listid%>'> Place Bid </a></td>
+                            <td><% if (tbl[i].max) { %> <%= tbl[i].max %><% } else { %>--<% } %></td>
+                            <td><a href='/getbid?listid=<%=tbl[i].listid%>&max=<% if (tbl[i].max) { %><%= tbl[i].max %><% } else { %><%= tbl[i].baseprice%><% } %>'> Place Bid </a></td>
                         </tr>
                         <%}%>
                     </tbody>

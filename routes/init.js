@@ -38,6 +38,8 @@ function initRouter(app) {
 	/* Nathan's function's lol */
 	app.get('/getcare', passport.authMiddleware(), getcare);
 	app.post('/findcare', passport.authMiddleware(), findcare);
+	app.get('/findcatservices', passport.authMiddleware(),findcatservices);
+	app.get('/finddogservices', passport.authMiddleware(),finddogservices);
 	app.get('/getbid', passport.authMiddleware(), getbid);
 	app.post('/postbid', passport.authMiddleware(), postbid);
 	app.get('/deletepet', passport.authMiddleware(), renderdelete);
@@ -245,7 +247,7 @@ function ownerprofile(req, res) {
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date > to_date('"+original_date+"','MM DD YYYY');";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
-		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/17/2019','MM DD YYYY');";
+		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price , CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/17/2019','MM DD YYYY');";
 		search_pet +=`with listmax as (select max(B.price) as maxprice,L.available_dates as d,
 		L.listid as listid,L.caretakerid as caretakerid, L.serviceId as serviceId from bid B left outer join list L on B.listid = L.listid group by L.listid),
   ownermax as
@@ -431,7 +433,7 @@ function becomeCaretaker(req, res) {
 //Adding User
 function register(req, res) {
 	res.render('register', {
-		page: 'register', auth: false, title: 'Owner Sign Up',
+		page: 'register', auth: false, title: 'Owner Sign Up', error: req.flash('error'),
 		messages: {
 			danger: req.flash('danger'),
 			warning: req.flash('warning'), success: req.flash('success')
@@ -461,6 +463,8 @@ function reg_user(req, res) {
 			pool.query(insert_query, function (err, result) {
 				if (err) { 
 					console.log(err); 
+					req.flash(err, 'User was not created.');
+					res.redirect('/register');
 				}
 				else {
 					// client.query('COMMIT')
@@ -546,20 +550,28 @@ function getcare(req, res) {
 	var tomonth=new Date(currdate).getMonth()+1;
 	var toyear=new Date(currdate).getFullYear();
 	var original_date=tomonth+'/'+todate+'/'+toyear;
-	var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from (list L natural join services S) inner join Users U on U.userId = L.caretakerId where L.available_dates > to_date('"+original_date+"','MM DD YYYY') order by L.available_dates;";
+	var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname,C.price as max  from ((list L natural join services S) inner join Users U on U.userId = L.caretakerId) left outer join cares C on L.listid = C.listid where L.available_dates > to_date('"+original_date+"','MM DD YYYY') and L.caretakerId <> '"+req.user.username+"'  order by L.available_dates;"
+	// var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from ((list L natural join services S) inner join Users U on U.userId = L.caretakerId) left outer join cares C on L.listid = C.listid where L.available_dates > to_date('"+original_date+"','MM DD YYYY') order by L.available_dates;";
 	// var query = 'SELECT L.caretakerid, C.review, L.baseprice, C.selected_date, L.listId from (list L natural join cares C)';
+	// query += `Select * from cares; END;`
 	console.log(query);
 	pool.query(query, (err, data) => {
 		console.log(data);
-		// tbl = data;
-		// console.log(tbl);
 		if (err || !data.rows || data.rows.length == 0) {
 			tbl = [];
+			fromcares=[];
 		} else {
 			tbl = data.rows;
+			// fromcares = data[2].rows;
 		}
+		console.log(tbl);
+		// console.log(fromcares);
 		console.log('rendering');
-		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl});
+		// if ('error' in req.flash()){
+		// 	console.log(req.flash());
+		// }
+
+		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl , xxx: req.flash()});
 	});
 }
 
@@ -570,21 +582,26 @@ function findcare (req, res) {
 	console.log(req.body);
 	var tbl = [];
 	var base;
-	var query =`Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from (list L natural join services S) inner join Users U on U.userId = L.caretakerId where L.available_dates = to_date('${date2}','MM DD YYYY') order by L.available_dates;`;
+	var query =`Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname,C.price as max  from ((list L natural join services S) inner join Users U on U.userId = L.caretakerId) left outer join cares C on L.listid = C.listid where L.available_dates = to_date('${date2}','MM DD YYYY') and L.caretakerId <> '`+req.user.username+`' order by L.available_dates;`;
 	// var query = `SELECT L.caretakerid, C.review,  C.selected_date, L.baseprice, L.listId from (list L natural join cares C) where C.selected_date = to_date('${date2}','MM DD YYYY');`;
-
+	// query += `Select * from cares; END;`
 	console.log(query);
 
 	pool.query(query, (err, data) => {
 		console.log(data);
+
 		if (err || !data.rows || data.rows.length === 0) {
 			tbl = [];
+			fromcares = [];
 			base = false;
+			req.flash('error', "Didn't find any correctdates");
+			res.redirect('/findcare');
 		} else {
 			tbl = data.rows;
+			// fromcares = data[2].rows;
 			base = true;
 		}
-		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl });
+		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl, error: req.flash('error')[0] });
 	});
 	
 	// console.log(dateValue);
@@ -672,7 +689,9 @@ function getbid(req,res){
 			}
 			else
 			{
-				res.render('bid',{ page: 'bid', title: 'Bidding', pets: result.rows, listid: req.query.listid});
+				console.log(result.rows);
+				req.flash('max',req.query.max);
+				res.render('bid',{ page: 'bid', title: 'Bidding', pets: result.rows, listid: req.query.listid, max: req.query.max});
 			}
 		});
 	}
@@ -706,7 +725,7 @@ function postbid(req,res){
 								res.redirect('/');
 							}
 
-							res.redirect('/');
+							res.redirect('/getcare');
 						}
 					});
 				}
@@ -734,7 +753,8 @@ function getreview(req,res,next){
 		res.render('getreview',{
 			page : 'getreview',
 			title: 'Add Review',
-			listid: req.query.listid
+			listid: req.query.listid,
+			error: req.flash(error)
 		});
 	}
 }
@@ -756,6 +776,7 @@ function postreview(req,res,next){
 		pool.query(update_cares , function (err, result){
 			if(err)
 			{
+				err = req.flash("warning", "didn't post review");
 				console.log(err);
 				res.redirect('/');
 			}
@@ -780,7 +801,7 @@ function seecaretaker(req,res,next){
 	{
 		var caretakerId = req.query.ctid;
 		seecaretaker_query = "BEGIN;";
-		seecaretaker_query += "Select * from cares where review is not null and caretakerId = '"+caretakerId+"';";
+		seecaretaker_query += "Select C.review, S.name as sname, U.name as uname from (cares C natural join services S) inner join users U on C.ownerId = U.userId where C.review is not null and C.caretakerId = '"+caretakerId+"';";
 		seecaretaker_query += "END;";
 		console.log(seecaretaker_query);
 		pool.query( seecaretaker_query , function(err,result){
@@ -796,6 +817,72 @@ function seecaretaker(req,res,next){
 			}
 		});
 	}
+}
+
+function findcatservices(req,res,next){
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
+		res.redirect('/');
+		return;
+	}
+	var tbl = [];
+	var curr = new Date();
+	var currdate = new Date();
+	var todate=new Date(currdate).getDate();
+	var tomonth=new Date(currdate).getMonth()+1;
+	var toyear=new Date(currdate).getFullYear();
+	var original_date=tomonth+'/'+todate+'/'+toyear;
+	var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname,C.price as max  from ((list L natural join (catservices CS natural join services S)) inner join Users U on U.userId = L.caretakerId) left outer join cares C on L.listid = C.listid where L.available_dates > to_date('"+original_date+"','MM DD YYYY') and L.caretakerId <> '"+req.user.username+"'  order by L.available_dates;"
+	console.log(query);
+	pool.query(query, (err, data) => {
+		console.log(data);
+		// console.log()
+		// tbl = data;
+		// console.log(tbl);
+		if (err || !data.rows || data.rows.length == 0) {
+			tbl = [];
+			fromcares=[];
+		} else {
+			tbl = data.rows;
+			// fromcares = data[2].rows;
+		}
+		console.log(tbl);
+		// console.log(fromcares);
+		console.log('rendering');
+		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl });
+	});
+}
+
+function finddogservices(req,res,next){
+	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
+		res.redirect('/');
+		return;
+	}
+	var tbl = [];
+	var curr = new Date();
+	var currdate = new Date();
+	var todate=new Date(currdate).getDate();
+	var tomonth=new Date(currdate).getMonth()+1;
+	var toyear=new Date(currdate).getFullYear();
+	var original_date=tomonth+'/'+todate+'/'+toyear;
+	var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname,C.price as max  from ((list L natural join (dogservices CS natural join services S)) inner join Users U on U.userId = L.caretakerId) left outer join cares C on L.listid = C.listid where L.available_dates > to_date('"+original_date+"','MM DD YYYY') and L.caretakerId <> '"+req.user.username+"'  order by L.available_dates;"
+	console.log(query);
+	pool.query(query, (err, data) => {
+		console.log(data);
+		// console.log()
+		// tbl = data;
+		// console.log(tbl);
+		if (err || !data.rows || data.rows.length == 0) {
+			tbl = [];
+			fromcares=[];
+		} else {
+			tbl = data.rows;
+			// fromcares = data[2].rows;
+		}
+		console.log(tbl);
+		// console.log(fromcares);
+		console.log('rendering');
+		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl });
+	});
 }
 
 
@@ -831,6 +918,8 @@ select * from ownermax O left outer join listmax L on O.listid = L.listid where 
 			}
 		});
 }
+
+
 module.exports = initRouter;
 
 

@@ -33,7 +33,8 @@
 <body>
 
     <h1><%= title%></h1>
-
+    <%- include navbar.ejs %>
+    <br>
     <div class="wrapper">
     <div class="card mb-3">
         <div class="card-header">
@@ -55,8 +56,8 @@
                         <% for(var i=0; i<reviews.length; i++) { %>
                         <tr>
                             <td><%= reviews[i].review%></td>
-                            <td><%= reviews[i].ownerid%></td>
-                            <td><%= reviews[i].serviceid%></td>
+                            <td><%= reviews[i].uname%></td>
+                            <td><%= reviews[i].sname%></td>
                         </tr>
                         <%}%>
                     </tbody>
