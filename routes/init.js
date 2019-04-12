@@ -32,6 +32,7 @@ function initRouter(app) {
 	app.get('/caretaker', passport.authMiddleware(), caretakerprofile);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
+	app.get('/updatelist',passport.authMiddleware(),updatelist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
 
 	/* Nathan's function's lol */
@@ -134,7 +135,6 @@ function getlist(req,res){
 		res.redirect('/');
 	}
 	else
-
 	{
 		var provided_services= "select P.serviceId as serviceId, S.name as name from (caretaker C natural join provides P) natural join services S where C.caretakerId ='"+req.user.username+"'"
 		// service_query= 'Select * from services where '
@@ -151,10 +151,18 @@ function getlist(req,res){
 		});
 		// console.log(provided_services);
 		// console.log(":::::"+provided_services[1].name);
-		
 	}
+}
 
+function updatelist(req,res){
+	if (!(req.session.status === 'caretaker' || req.session.status === 'both' ))
+	{
+		res.redirect('/');
+	}
+	else
+	{
 
+	}
 }
 
 function postlist(req, res) {
@@ -265,7 +273,9 @@ function caretakerprofile(req,res){
 			{
 				var s = result[2].rows;
 				var l = result[1].rows;
+				console.log('here bitchh');
 				console.log(l);
+				console.log(s);
 				// var date=result[1].rows[0].available_dates;
 				// var todate=new Date(date).getDate();
 			 //    var tomonth=new Date(date).getMonth()+1;
