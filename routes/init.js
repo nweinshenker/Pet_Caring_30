@@ -32,7 +32,7 @@ function initRouter(app) {
 	app.get('/caretaker', passport.authMiddleware(), caretakerprofile);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
-	app.get('/updatelist',passport.authMiddleware(),updatelist);
+	app.post('/updatelist',passport.authMiddleware(),updatelist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
 
 	/* Nathan's function's lol */
@@ -163,7 +163,38 @@ function updatelist(req,res){
 	}
 	else
 	{
-
+		console.log('hehehehehehehe');
+		let query_serviceid=`SELECT serviceId from services S where S.name='${req.body.service}';`;
+		console.log(query_serviceid);
+		pool.query(query_serviceid, function(err,result){
+			if(err){
+				console.log('error in query_serviceid');
+				console.log(err);
+				res.redirect('/caretaker');
+			}
+			else{
+				console.log('heylo');
+				console.log(result.rows[0].serviceid);
+				let update_query=`UPDATE list set basePrice=${req.body.baseprice}, available_dates=to_date('${req.body.datepicker}','YYYY MM DD'), serviceId= '${result.rows[0].serviceid}' where listId='${req.body.listid}';`;
+				console.log(update_query);
+				pool.query(update_query, function (err1,result1) {
+					if(err1){
+						console.log(err1);
+						res.redirect('/caretaker');
+					}
+					else{
+						if(result1.rowCount ===0){
+							console.log('Inavlid');
+						}
+						else{
+							console.log('Valid');
+						}
+						console.log(result1);
+						res.redirect('/caretaker');
+					}
+				});
+			}
+		});
 	}
 }
 
@@ -217,7 +248,7 @@ function ownerprofile(req, res) {
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date > to_date('"+original_date+"','MM DD YYYY');";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
-		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price , CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/17/2019','MM DD YYYY');";
+		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price , CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/18/2019','MM DD YYYY');";
 		search_pet +=`with listmax as (select max(B.price) as maxprice,L.available_dates as d,
 		L.listid as listid,L.caretakerid as caretakerid, L.serviceId as serviceId from bid B left outer join list L on B.listid = L.listid group by L.listid),
   ownermax as
@@ -276,11 +307,10 @@ function caretakerprofile(req,res){
 			{
 				var s = result[2].rows;
 				var l = result[1].rows;
-				console.log('here bitchh');
 				console.log(l);
 				console.log(s);
 				// var date=result[1].rows[0].available_dates;
-				// var todate=new Date(date).getDate();
+				// var todate=new Date(date).getDate();s
 			 //    var tomonth=new Date(date).getMonth()+1;
 			 //    var toyear=new Date(date).getFullYear();
 			 //    var original_date=tomonth+'/'+todate+'/'+toyear;
@@ -726,8 +756,7 @@ function getreview(req,res,next){
 		res.render('getreview',{
 			page : 'getreview',
 			title: 'Add Review',
-			listid: req.query.listid,
-			error: req.flash(error)
+			listid: req.query.listid
 		});
 	}
 }
