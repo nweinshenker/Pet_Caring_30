@@ -144,11 +144,12 @@ function getlist(req,res){
 			if(err)
 			{
 				console.log(err);
+				req.flash("error", "Please check the value size");
 				res.redirect('/');
 			}
 			else
 			{
-				res.render('list', { page: 'list' , title: 'Add Availability' , services: result.rows});
+				res.render('list', { page: 'list' , title: 'Add Availability' , services: result.rows, xxx:req.flash()});
 			}
 		});
 		// console.log(provided_services);
@@ -305,7 +306,7 @@ function getpet(req, res) {
 		res.redirect('/');
 	}
 	else
-		res.render('addpet', { page: 'addpet', title: 'Add Pet' });
+		res.render('addpet', { page: 'addpet', title: 'Add Pet', xxx: req.flash()});
 }
 
 function postpet(req, res) {
@@ -344,7 +345,8 @@ function postpet(req, res) {
 		if(err)
 		{
 			console.log(err);
-			res.redirect('/');
+			req.flash('error', "Unsuccesful register of pet");
+			res.redirect('/getpet');
 		}
 		else {
 			console.log(result);
@@ -529,6 +531,8 @@ function getcare(req, res) {
 		if (err || !data.rows || data.rows.length == 0) {
 			tbl = [];
 			fromcares=[];
+			req.flash('error', "wrong dates");
+			res.redirect('/getcare');
 		} else {
 			tbl = data.rows;
 			// fromcares = data[2].rows;
@@ -540,7 +544,7 @@ function getcare(req, res) {
 		// 	console.log(req.flash());
 		// }
 
-		res.render('carelist', { page: '', title: 'CareList', base: true, tbl:tbl , xxx: req.flash()});
+		res.render('carelist', { page: '', title: 'CareList', base: true, tbl: tbl, xxx: req.flash() });
 	});
 }
 
@@ -563,14 +567,14 @@ function findcare (req, res) {
 			tbl = [];
 			fromcares = [];
 			base = false;
-			req.flash('error', "Didn't find any correctdates");
-			res.redirect('/findcare');
+			// req.flash('error', "Didn't find any correct dates");
+			// res.redirect('/findcare');
 		} else {
 			tbl = data.rows;
 			// fromcares = data[2].rows;
 			base = true;
 		}
-		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl, error: req.flash('error')[0] });
+		res.render('carelist', { page: '', title: 'CareList', base: base, tbl: tbl, xxx: req.flash() });
 	});
 	
 	// console.log(dateValue);
