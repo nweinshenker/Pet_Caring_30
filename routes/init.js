@@ -548,8 +548,26 @@ function renderdelete(req, res) {
 	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
 	}
-	else
-		res.render('deletepet', { page: 'deletepet', title: 'Delete Pet' });
+	var search_pet = "BEGIN;";
+	var pets = [];
+	search_pet += "Select * from petowned P natural join cat C where P.ownerId = '" + req.user.username + "';";
+	search_pet += "Select * from petowned P natural join dog D where P.ownerId = '" + req.user.username + "';";
+	search_pet += "END;";
+	console.log(search_pet);
+	pool.query(search_pet, (err,data)=> {
+		if (err) {
+			console.log(err);
+			res.redirect('/')
+		}
+		else {
+			var cats = data[1].rows;
+			console.log(cats);
+			var dogs = data[2].rows;
+			pets += cats;
+			pets += dogs;
+			res.render('deletepet', { page: 'deletepet', title: 'Delete Pet', cats:cats, dogs: dogs});
+		}
+	})
 }
 
 function postdelete(req, res) {
@@ -559,7 +577,7 @@ function postdelete(req, res) {
 	}
 	var pet_num = req.body.petnum;
 	console.log(pet_num);
-	var delete_pet = "Delete from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
+	var delete_pet = "Delete from petowned P where P.ownerId = '" + req.user.username + "' and P.name = '" + pet_num + "' ;"
 	console.log(delete_pet);
 	pool.query(delete_pet, (err, data) => {
 		if (err) {
