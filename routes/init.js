@@ -428,7 +428,9 @@ function reg_user(req, res) {
 		}
 		else {
 			pool.query(insert_query, function (err, result) {
-				if (err) { console.log(err); }
+				if (err) { 
+					console.log(err); 
+				}
 				else {
 					// client.query('COMMIT')
 					console.log(result);
@@ -568,8 +570,26 @@ function renderdelete(req, res) {
 	if (!(req.session.status === 'owner' || req.session.status === 'both')) {
 		res.redirect('/');
 	}
-	else
-		res.render('deletepet', { page: 'deletepet', title: 'Delete Pet' });
+	var search_pet = "BEGIN;";
+	var pets = [];
+	search_pet += "Select * from petowned P natural join cat C where P.ownerId = '" + req.user.username + "';";
+	search_pet += "Select * from petowned P natural join dog D where P.ownerId = '" + req.user.username + "';";
+	search_pet += "END;";
+	console.log(search_pet);
+	pool.query(search_pet, (err,data)=> {
+		if (err) {
+			console.log(err);
+			res.redirect('/')
+		}
+		else {
+			var cats = data[1].rows;
+			console.log(cats);
+			var dogs = data[2].rows;
+			pets += cats;
+			pets += dogs;
+			res.render('deletepet', { page: 'deletepet', title: 'Delete Pet', cats:cats, dogs: dogs});
+		}
+	})
 }
 
 function postdelete(req, res) {
