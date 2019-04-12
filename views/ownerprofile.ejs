@@ -55,6 +55,21 @@
     <br>
     <br>
        <% } %>
+       <% if (losing.length > 0) { %>
+    <h3>Losing bids</h3>
+    <ol>
+        <% for( var i in losing ) {%>
+        <% var date = losing[i].d;
+        var todate=new Date(date).getDate();
+        var tomonth=new Date(date).getMonth()+1;
+        var toyear=new Date(date).getFullYear();
+        var original_date=tomonth+'/'+todate+'/'+toyear; %>
+        <li><a href='/getbid?listid=<%= losing[i].listid%>'><%= losing[i].uname %>-----<%= losing[i].sname %>-------<%= losing[i].maxprice %>-------<%= losing[i].myprice %>-----<%= original_date %></a></li>
+        <% } %>
+    </ol>
+    <br>
+    <br>
+       <% } %>
     <% if (pasts.length > 0) { %>
     <h3>History</h3>
     <ol>

@@ -207,6 +207,15 @@ function ownerprofile(req, res) {
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date > to_date('"+original_date+"','MM DD YYYY');";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
 		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/17/2019','MM DD YYYY');";
+		search_pet +=`with listmax as (select max(B.price) as maxprice,L.available_dates as d,
+		L.listid as listid,L.caretakerid as caretakerid, L.serviceId as serviceId from bid B left outer join list L on B.listid = L.listid group by L.listid),
+  ownermax as
+ (select max(B.price) as myprice,B.ownerId as ownerId, B.listId as listid
+  from bid B left outer join list L on B.listid = L.listid group by B.ownerId,B.listid),
+ withoutnames as
+(select * from ownermax O left outer join listmax L using (listid) where O.myprice < L.maxprice)
+select W.listid, W.myprice, W.maxprice, U.name as uname, S.name as sname, W.d as d from (withoutnames W natural join services S) inner join users U on U.userid = W.caretakerid 
+where W.ownerId =  '`+req.user.username+`';`;
 		search_pet += "END;"
 		console.log("search_pet::::::::::::::::::"+search_pet);
 		pool.query(search_pet , function (err, result){
@@ -220,12 +229,13 @@ function ownerprofile(req, res) {
 				var dogs = result[2].rows;
 				var cats = result[1].rows;
 				var past = result[4].rows;
+				var lost = result[5].rows;
 				console.log(dogs);
 				console.log(past);
 				console.log(cats);
 				console.log(result[3].rows);
 				// console.log(cats[0].petnum);
-				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows , futures: result[3].rows, pasts: past});
+				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows , futures: result[3].rows, pasts: past, losing : lost});
 			}
 		});
 	}
@@ -732,7 +742,14 @@ function testing(req,res,next){
 	console.log(d);
 	var search_list = "Select convert(varchar(10),available_dates,103) from list L natural join services S where L.caretakerId = '"+req.user.username+"'";
 	var update_cares = "Update cares set review = '"+content+"' where listId = '"+num+"'";
-	pool.query(search_list , function (err, result){
+	var complex = `with listmax as
+ (select max(B.price) as maxprice,L.available_dates as d,L.listid as listid,L.caretakerid as caretakerid, L.serviceId as serviceId
+ from bid B left outer join list L on B.listid = L.listid group by L.listid),
+  ownermax as
+ (select max(B.price) as myprice,B.ownerId as ownerId, B.listId as listid
+  from bid B left outer join list L on B.listid = L.listid group by B.ownerId,B.listid)
+select * from ownermax O left outer join listmax L on O.listid = L.listid where O.myprice < L.maxprice`
+	pool.query(complex , function (err, result){
 			if(err)
 			{
 				console.log(err);
@@ -741,8 +758,8 @@ function testing(req,res,next){
 			}
 			else
 			{
-				var d = new Date();
-				console.log(d)
+				// var d = new Date();
+				// console.log(d)
 				// console.log(cats[0].petnum);
 				console.log(result.rows);
 				res.redirect('/');
