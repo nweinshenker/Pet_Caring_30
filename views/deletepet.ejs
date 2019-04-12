@@ -34,10 +34,10 @@
             <select class="browser-default custom-select" id="petnum" name="petnum" required>
                 <option value="">Please Select a Pet</option>
                 <% for( var i in dogs) {%>
-                <option value="<%= dogs[i].name %>"> <%= dogs[i].name %></option>
+                <option value="<%= dogs[i].petnum %>"> <%= dogs[i].name %></option>
                 <% } %>
                 <% for( var i in cats) {%>
-                <option value="<%= cats[i].name %>"> <%= cats[i].name %></option>
+                <option value="<%= cats[i].petnum %>"> <%= cats[i].name%></option>
                 <% } %>
             </select>
         </div>

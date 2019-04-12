@@ -418,7 +418,9 @@ function reg_user(req, res) {
 		}
 		else {
 			pool.query(insert_query, function (err, result) {
-				if (err) { console.log(err); }
+				if (err) { 
+					console.log(err); 
+				}
 				else {
 					// client.query('COMMIT')
 					console.log(result);
@@ -587,7 +589,7 @@ function postdelete(req, res) {
 	}
 	var pet_num = req.body.petnum;
 	console.log(pet_num);
-	var delete_pet = "Delete from petowned P where P.ownerId = '" + req.user.username + "' and P.name = '" + pet_num + "' ;"
+	var delete_pet = "Delete from petowned P where P.ownerId = '" + req.user.username + "' and P.petnum = '" + pet_num + "' ;"
 	console.log(delete_pet);
 	pool.query(delete_pet, (err, data) => {
 		if (err) {
