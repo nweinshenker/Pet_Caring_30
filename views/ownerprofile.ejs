@@ -40,17 +40,37 @@
     <br>
     <br>
        <% } %>
-    <% if (dogs.length > 0) { %>
+    <% if (futures.length > 0) { %>
+    <h3>Current bids</h3>
+    <ol>
+        <% for( var i in futures ) {%>
+        <% var date = futures[i].date;
+        var todate=new Date(date).getDate();
+        var tomonth=new Date(date).getMonth()+1;
+        var toyear=new Date(date).getFullYear();
+        var original_date=tomonth+'/'+todate+'/'+toyear; %>
+        <li><%= futures[i].uname %>--------<%= futures[i].sname %>----------<%= futures[i].price %>--------<%= original_date %></li>
+        <% } %>
+    </ol>
+    <br>
+    <br>
+       <% } %>
+    <% if (pasts.length > 0) { %>
     <h3>History</h3>
     <ol>
         <% for( var i in pasts ) {%>
-        <li><a href='/getreview?listid=<%= pasts[i].lid%>'><%= pasts[i].uname %>--------<%= pasts[i].sname %></a></li>
+        <% var date = pasts[i].date;
+        var todate=new Date(date).getDate();
+        var tomonth=new Date(date).getMonth()+1;
+        var toyear=new Date(date).getFullYear();
+        var past_date=tomonth+'/'+todate+'/'+toyear; %>
+        <li><a href='/getreview?listid=<%= pasts[i].lid%>'><%= pasts[i].uname %>--------<%= pasts[i].sname %>--------<%= pasts[i].price %>--------<%= past_date %></a></li>
         <% } %>
     </ol>
     <% } %>
     <a href="getpet">ADD PET</a><br>
     <a href="deletepet">DELETE PET</a><br>
-    <a href="owner/search">Search for Caretakers</a>
+    <a href="getcare">Search for Caretakers</a>
 
 
 </body>

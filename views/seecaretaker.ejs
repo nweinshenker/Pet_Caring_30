@@ -35,53 +35,28 @@
     <h1><%= title%></h1>
 
     <div class="wrapper">
-
-    <form id="html_form" role="form" method="post" action="findcare">
-    
-        <div class="form-group">
-            <label for="day">Day</label>
-            <input id="day" class="datepicker" name="day" width="276" />
-            <script>
-                $('.datepicker').datepicker({
-                    uiLibrary: 'bootstrap4'
-                });
-            </script>
-        </div>
-        <button type="hidden" id="myButton" class="btn btn-primary" >Find Available CareTakers</button>
-    </form>
-
-
     <div class="card mb-3">
         <div class="card-header">
-            <i class="fas fa-dog"></i> &nbsp; CareTaker List
+            <i class="fas fa-dog"></i> &nbsp; Reviews
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>CareTaker Name</th>
-                            <th>Available Dates</th>
-                            <th>Service Name</th>
-                            <th>Price</th>
-                            <th>Bid</th>
+                            <th>Comment</th>
+                            <th>Owner</th>
+                            <th>Service</th>
                         </tr>
                     </thead>
                     <tfoot>
                     </tfoot>
                     <tbody>
-                        <% for(var i=0; i<tbl.length; i++) { %>
-                            <% var date = tbl[i].available_dates;
-                            var todate=new Date(date).getDate();
-                            var tomonth=new Date(date).getMonth()+1;
-                            var toyear=new Date(date).getFullYear();
-                            var original_date=tomonth+'/'+todate+'/'+toyear; %>
+                        <% for(var i=0; i<reviews.length; i++) { %>
                         <tr>
-                            <td><a href='/seecaretaker?ctid=<%=tbl[i].caretakerid%>'> <%= tbl[i].name%></a></td>
-                            <td><%= original_date%></td>
-                            <td><%= tbl[i].sname%></td>
-                            <td><%= tbl[i].baseprice%></td>
-                            <td><a href='/getbid?listid=<%=tbl[i].listid%>'> Place Bid </a></td>
+                            <td><%= reviews[i].review%></td>
+                            <td><%= reviews[i].ownerid%></td>
+                            <td><%= reviews[i].serviceid%></td>
                         </tr>
                         <%}%>
                     </tbody>
