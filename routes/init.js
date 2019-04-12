@@ -204,7 +204,9 @@ function ownerprofile(req, res) {
 		var original_date=tomonth+'/'+todate+'/'+toyear;
 		search_pet += "Select * from petowned P natural join cat C where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
-		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
+		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date > to_date('"+original_date+"','MM DD YYYY');";
+		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
+		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/17/2019','MM DD YYYY');";
 		search_pet += "END;"
 		console.log("search_pet::::::::::::::::::"+search_pet);
 		pool.query(search_pet , function (err, result){
@@ -217,12 +219,13 @@ function ownerprofile(req, res) {
 			{
 				var dogs = result[2].rows;
 				var cats = result[1].rows;
-				var past = result[3].rows;
+				var past = result[4].rows;
 				console.log(dogs);
 				console.log(past);
 				console.log(cats);
+				console.log(result[3].rows);
 				// console.log(cats[0].petnum);
-				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows , pasts: past});
+				res.render('ownerprofile', { page: 'ownerprofile' , title: 'Owner', cats: result[1].rows, dogs: result[2].rows , futures: result[3].rows, pasts: past});
 			}
 		});
 	}
@@ -490,7 +493,7 @@ function getcare(req, res) {
 	var tomonth=new Date(currdate).getMonth()+1;
 	var toyear=new Date(currdate).getFullYear();
 	var original_date=tomonth+'/'+todate+'/'+toyear;
-	var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from (list L natural join services S) inner join Users U on U.userId = L.caretakerId where L.available_dates > to_date('"+original_date+"','MM DD YYYY');";
+	var query = "Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from (list L natural join services S) inner join Users U on U.userId = L.caretakerId where L.available_dates > to_date('"+original_date+"','MM DD YYYY') order by L.available_dates;";
 	// var query = 'SELECT L.caretakerid, C.review, L.baseprice, C.selected_date, L.listId from (list L natural join cares C)';
 	console.log(query);
 	pool.query(query, (err, data) => {
@@ -514,7 +517,7 @@ function findcare (req, res) {
 	console.log(req.body);
 	var tbl = [];
 	var base;
-	var query =`Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from (list L natural join services S) inner join Users U on U.userId = L.caretakerId where L.available_dates = to_date('${date2}','MM DD YYYY');`;
+	var query =`Select U.name as name, L.caretakerId , L.listId , L.available_dates, L.baseprice , S.name as sname  from (list L natural join services S) inner join Users U on U.userId = L.caretakerId where L.available_dates = to_date('${date2}','MM DD YYYY') order by L.available_dates;`;
 	// var query = `SELECT L.caretakerid, C.review,  C.selected_date, L.baseprice, L.listId from (list L natural join cares C) where C.selected_date = to_date('${date2}','MM DD YYYY');`;
 
 	console.log(query);
