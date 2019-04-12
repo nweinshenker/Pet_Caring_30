@@ -254,6 +254,7 @@ RETURNS TRIGGER AS
 $$
 DECLARE  existence integer;
 DECLARE maxPrice integer;
+DECLARE bprice integer;
 BEGIN
     select count(*) from bid b1 where NEW.listId=b1.listId into existence;
     if existence > 0 then
@@ -266,8 +267,12 @@ BEGIN
                 return null;
             end if;
     else
-        raise notice 'New bid successful';
-        return NEW;
+        select l1.baseprice from list l1 where NEW.listId=l1.listId into bprice;
+        if NEW.price < bprice then
+            return null;
+        else
+            return NEW;
+        end if;
     end if;
 END;
 $$ LANGUAGE plpgsql;

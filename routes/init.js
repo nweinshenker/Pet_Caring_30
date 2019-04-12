@@ -727,8 +727,9 @@ function postbid(req,res){
 								console.log();
 								res.redirect('/');
 							}
-
-							res.redirect('/getcare');
+							else {
+								res.redirect('/getcare');
+							}
 						}
 					});
 				}
