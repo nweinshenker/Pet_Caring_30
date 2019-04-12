@@ -81,11 +81,12 @@ function addservice(req,res){
 			if(err)
 			{
 				console.log(err);
-				res.redirect('/');
+				req.flash("error", "didn't selected a service");
+				res.redirect('/ct/service');
 			}
 			else
 			{
-				res.render('addservice',{ page: 'addservice', title: 'Add Service', services: result.rows});
+				res.render('addservice',{ page: 'addservice', title: 'Add Service', services: result.rows, xxx: req.flash()});
 			}
 		});
 	}
@@ -144,12 +145,10 @@ function getlist(req,res){
 			if(err)
 			{
 				console.log(err);
-				req.flash("error", "Please check the value size");
-				res.redirect('/');
 			}
 			else
 			{
-				res.render('list', { page: 'list' , title: 'Add Availability' , services: result.rows, xxx:req.flash()});
+				res.render('list', { page: 'list', title: 'Add Availability', services: result.rows, xxx: req.flash()});
 			}
 		});
 		// console.log(provided_services);
@@ -185,7 +184,8 @@ function postlist(req, res) {
 		pool.query(sql_query, function (err, result) {
 			if (err){
 				console.log(err);
-				res.redirect('/');
+				req.flash("error", "overfload on size of input");
+				res.redirect('/getlist');
 			}
 			else {
 				console.log(result);
