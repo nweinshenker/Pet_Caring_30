@@ -434,10 +434,10 @@ function becomeCaretaker(req, res) {
 //Adding User
 function register(req, res) {
 	res.render('register', {
-		page: 'register', auth: false, title: 'Owner Sign Up', error: req.flash('error'),
+		page: 'register', auth: false, title: 'Owner Sign Up',
 		messages: {
 			danger: req.flash('danger'),
-			warning: req.flash('warning'), success: req.flash('success')
+			warning: req.flash('error'), success: req.flash('success')
 		}
 	});
 	console.log(req.flash('warning'));
@@ -464,7 +464,7 @@ function reg_user(req, res) {
 			pool.query(insert_query, function (err, result) {
 				if (err) { 
 					console.log(err); 
-					req.flash(err, 'User was not created.');
+					req.flash('error', 'User was not created.');
 					res.redirect('/register');
 				}
 				else {
