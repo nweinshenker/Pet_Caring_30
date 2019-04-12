@@ -50,37 +50,32 @@
                         var todate=new Date(date).getDate();
                         var tomonth=new Date(date).getMonth()+1;
                         var toyear=new Date(date).getFullYear();
-                        var original_date=tomonth+'/'+todate+'/'+toyear;
-                        var original_date2
-                        if (tomonth<10){
-                            original_date2=toyear+'-0'+tomonth+'-'+todate;;
-                        }
-                        else{
-                            original_date2=toyear+'-'+tomonth+'-'+todate;
-                        }%>
-                    <form action="/updatelist" role="form" method="post">
+                        var original_date=tomonth+'/'+todate+'/'+toyear; %>
                     <tr>
                         <td>
-                            <select class="browser-default custom-select" name="service" required>
+                            <select class="browser-default custom-select" id="service" name="service" required>
                                 <% for( var j in skills ) {%>
                                     <option value="<%= skills[j].name %>" <%if(lists[i].name==skills[j].name){%> selected="selected" <%}%>><%= skills[j].name %></option>
                                 <% } %>
                             </select>
                         </td>
                         <td>
-                            <input name="baseprice" type="number" required value="<%=lists[i].baseprice%>">
+                            <input type="number" required value="<%=lists[i].baseprice%>">
                         </td>
                         <td>
-                            <input type="date" name="datepicker" value="<%= original_date2 %>" width="276" required/>
+                            <input class="datepicker" value="<%= original_date %>" width="276" />
                         </td>
-                        <input type="hidden" name="listid" value="<%=lists[i].listid%>">
-                        <td><button class="heylo" type="submit" class="btn btn-primary bg-dark">Update</button></td>
+                        <td><a href="/updatelist?listid=<%=lists[i].listid%>"><button type="submit" class="btn btn-primary bg-dark">Update</button></a></td>
                     </tr>
-                    </form>
                 <% } %>
             </tbody>
         </table>
 
+    <script>
+        $('.datepicker').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+    </script>
 
     <br/>
        <% } %>
