@@ -32,7 +32,7 @@ function initRouter(app) {
 	app.get('/caretaker', passport.authMiddleware(), caretakerprofile);
 	app.get('/becomeCaretaker', passport.authMiddleware(), becomeCaretaker);
 	app.get('/getlist', passport.authMiddleware(), getlist);
-	app.get('/updatelist',passport.authMiddleware(),updatelist);
+	app.post('/updatelist',passport.authMiddleware(),updatelist);
 	app.get('/ct/service',passport.authMiddleware(), addservice);
 
 	/* Nathan's function's lol */
@@ -161,7 +161,38 @@ function updatelist(req,res){
 	}
 	else
 	{
-
+		console.log('hehehehehehehe');
+		let query_serviceid=`SELECT serviceId from services S where S.name='${req.body.service}';`;
+		console.log(query_serviceid);
+		pool.query(query_serviceid, function(err,result){
+			if(err){
+				console.log('error in query_serviceid');
+				console.log(err);
+				res.redirect('/caretaker');
+			}
+			else{
+				console.log('heylo');
+				console.log(result.rows[0].serviceid);
+				let update_query=`UPDATE list set basePrice=${req.body.baseprice}, available_dates=to_date('${req.body.datepicker}','YYYY MM DD'), serviceId= '${result.rows[0].serviceid}' where listId='${req.body.listid}';`;
+				console.log(update_query);
+				pool.query(update_query, function (err1,result1) {
+					if(err1){
+						console.log(err1);
+						res.redirect('/caretaker');
+					}
+					else{
+						if(result1.rowCount ===0){
+							console.log('Inavlid');
+						}
+						else{
+							console.log('Valid');
+						}
+						console.log(result1);
+						res.redirect('/caretaker');
+					}
+				});
+			}
+		});
 	}
 }
 
