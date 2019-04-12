@@ -584,7 +584,6 @@ function logout(req, res) {
 }
 
 function getbid(req,res){
-	console.log('its running');
 	if (req.session.status === 'caretaker' || req.session.status === 'none')
 	{
 		console.log('err');
@@ -592,10 +591,18 @@ function getbid(req,res){
 	}
 	else
 	{
-		res.render('bid',{
-			page : 'bid',
-			title: 'Bidding',
-			listid: req.query.listid
+		console.log('in getbid');
+		let find_pets = `SELECT name from petowned P where P.ownerId='${req.user.username}';`;
+		pool.query(find_pets, function(err,result){
+			if(err)
+			{
+				console.log(err);
+				res.redirect('/');
+			}
+			else
+			{
+				res.render('bid',{ page: 'bid', title: 'Bidding', pets: result.rows, listid: req.query.listid});
+			}
 		});
 	}
 }
@@ -607,18 +614,13 @@ function postbid(req,res){
 	}
 	else
 	{
-		console.log(req.body);
-		console.log(req.user.username);
 		petname=req.body.petname;
 		var query_petnum = `SELECT petnum from petowned where name='${petname}' and ownerId='${req.user.username}';`;
-		console.log(query_petnum);
 		pool.query(query_petnum, function (err,result) {
-			console.log('bsdkkkkk');
 			if(err){
 				console.log('err'+ err);
 			}
 			else{
-				console.log(result);
 				if(result.rows.length > 0) {
 					var insert_query = `INSERT INTO bid VALUES('${req.user.username}','${req.body.listid}','${req.body.price}','${result.rows[0].petnum}')`;
 					pool.query(insert_query, function (err, result) {
@@ -629,9 +631,10 @@ function postbid(req,res){
 						}
 						else {
 							if(result.rowCount === 0){
+								console.log();
 								res.redirect('/');
 							}
-							console.log(result);
+
 							res.redirect('/');
 						}
 					});

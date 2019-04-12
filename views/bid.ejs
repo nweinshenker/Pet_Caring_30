@@ -13,9 +13,14 @@
                 <label for="price">Price</label>
                 <input class="form-control" type="number" name="price" id="price" placeholder="Enter price" required/>
             </div>
-            <div class="floating-label-form-group">
-                <label for="petname">Pet Name</label>
-                <input class="floating-label-form-group" type="text" name="petname" id="petname" placeholder="Enter Name" required maxlength="50"/>
+            <div class="form-group">
+                <label for="petname">Select Pet</label>
+                <select class="browser-default custom-select" id="petname" name="petname" required>
+                    <option value="">Select Pet</option>
+                    <% for( var i in pets ) {%>
+                        <option value="<%= pets[i].name%>" > <%= pets[i].name %></option>
+                    <% } %>
+                </select>
             </div>
             <input type="hidden" name="listid" value="<%=listid%>"/>
             <button type="submit" class="btn-primary">Submit</button>
