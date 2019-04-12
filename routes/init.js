@@ -694,7 +694,7 @@ function getbid(req,res){
 			{
 				console.log(result.rows);
 				req.flash('max',req.query.max);
-				res.render('bid',{ page: 'bid', title: 'Bidding', pets: result.rows, listid: req.query.listid, max: req.query.max});
+				res.render('bid',{ page: 'bid', title: 'Bidding', pets: result.rows, listid: req.query.listid, max: req.query.max, xxx: req.flash('error')[0]});
 			}
 		});
 	}
@@ -724,8 +724,9 @@ function postbid(req,res){
 						}
 						else {
 							if(result.rowCount === 0){
-								console.log();
-								res.redirect('/');
+								// console.log();
+								req.flash('error','Enter a higher bid');
+								res.redirect('/getbid');
 							}
 							else {
 								res.redirect('/getcare');
