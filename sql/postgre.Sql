@@ -331,3 +331,44 @@ CREATE TRIGGER bid_sanitize
     BEFORE UPDATE ON list
     FOR EACH ROW
 EXECUTE PROCEDURE bid_validity();
+
+
+/*
+BEGIN;Select *
+    from petowned P
+    natural join cat C where P.ownerId = 'tarush@gmail.com';
+    Select *
+    from petowned P
+    natural join dog D where P.ownerId = 'tarush@gmail.com';
+    Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date
+    from (cares CA natural join services S ) inner join users U on U.userId  = CA.caretakerId
+    where CA.ownerId ='tarush@gmail.com' and selected_date > to_date('4/12/2019','MM DD YYYY');Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date
+    from (cares CA natural join services S ) inner join users U on U.userId  = CA.caretakerId
+    where CA.ownerId ='tarush@gmail.com' and selected_date <= to_date('4/12/2019','MM DD YYYY');with
+        listmax
+        as
+        (
+            select max(B.price) as maxprice, L.available_dates as d,
+                L.listid as listid, L.caretakerid as caretakerid, L.serviceId as serviceId
+            from bid B left outer join list L on B.listid = L.listid
+            group by L.listid
+        ),
+        ownermax
+        as
+        (
+            select max(B.price) as myprice, B.ownerId as ownerId, B.listId as listid
+            from bid B left outer join list L on B.listid = L.listid
+            group by B.ownerId,B.listid
+        ),
+        withoutnames
+        as
+        (
+            select *
+            from ownermax O left outer join listmax L  using (listid)
+            where O.myprice < L.maxprice
+        )
+    select W.listid, W.myprice, W.maxprice, U.name as uname, S.name as sname, W.d as d
+    from (withoutnames W natural join services S ) inner join users U on U.userid = W.caretakerid
+    where W.ownerId =  'tarush@gmail.com';
+END;
+/*
