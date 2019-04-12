@@ -248,7 +248,7 @@ function ownerprofile(req, res) {
 		search_pet += "Select * from petowned P natural join dog D where P.ownerId = '"+req.user.username+"';";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date > to_date('"+original_date+"','MM DD YYYY');";
 		search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price, CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('"+original_date+"','MM DD YYYY');";
-		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price , CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/17/2019','MM DD YYYY');";
+		// search_pet += "Select U.name as Uname, S.name as Sname, CA.listId as lid, CA.price as price , CA.selected_date as date from (cares CA natural join services S) inner join users U on U.userId  = CA.caretakerId where CA.ownerId ='"+req.user.username+"' and selected_date <= to_date('4/18/2019','MM DD YYYY');";
 		search_pet +=`with listmax as (select max(B.price) as maxprice,L.available_dates as d,
 		L.listid as listid,L.caretakerid as caretakerid, L.serviceId as serviceId from bid B left outer join list L on B.listid = L.listid group by L.listid),
   ownermax as
@@ -307,11 +307,10 @@ function caretakerprofile(req,res){
 			{
 				var s = result[2].rows;
 				var l = result[1].rows;
-				console.log('here bitchh');
 				console.log(l);
 				console.log(s);
 				// var date=result[1].rows[0].available_dates;
-				// var todate=new Date(date).getDate();
+				// var todate=new Date(date).getDate();s
 			 //    var tomonth=new Date(date).getMonth()+1;
 			 //    var toyear=new Date(date).getFullYear();
 			 //    var original_date=tomonth+'/'+todate+'/'+toyear;
@@ -757,8 +756,7 @@ function getreview(req,res,next){
 		res.render('getreview',{
 			page : 'getreview',
 			title: 'Add Review',
-			listid: req.query.listid,
-			error: req.flash(error)
+			listid: req.query.listid
 		});
 	}
 }
