@@ -41,8 +41,8 @@ Sample output after running `npm start`
 
 ## Authors
 
-* **Tarush Agurwal** 
-* **Divyanesh**
+* **Tarush Agarwal** 
+* **Divyansh**
 * **Caroline Busse**
 * **Nathan Weinshenker**
 
